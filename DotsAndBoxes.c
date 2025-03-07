@@ -1,5 +1,6 @@
 #include "game.h"
 
+
 int main() {                         
     GameState game = {
         .horizontal_lines = {
