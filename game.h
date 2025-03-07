@@ -1,10 +1,8 @@
 #ifndef game_h
 #define game_h
 
-#include "Line.c"
-#include "Logic.c"
-#include "PrintMethod.c"
 #include <stdbool.h>
+#include <stdio.h>
 
 #define ROWS 4
 #define COLS 5
@@ -24,6 +22,7 @@ int line_type(int r1, int c1, int r2, int c2);
 bool adjacent (int r1, int c1, int r2, int c2);
 bool check_box(GameState *state, int r, int c);
 int process_move(GameState *state, int r1, int c1, int r2, int c2);
-void PrintBoard(char board[9][11]);
+void PrintBoard(char board[ROWS * 2 + 1][COLS * 2 + 1]);
+void printLine(char board[ROWS * 2 + 1][COLS * 2 + 1], int x1, int y1, int x2, int y2);
 
 #endif

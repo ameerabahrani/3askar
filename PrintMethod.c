@@ -1,5 +1,6 @@
 // print method implemented here
 #include <stdio.h>
+#include "game.h"
 void PrintBoard(char board[9][11])
 {
     printf("  0 1 2 3 4 5\n");
