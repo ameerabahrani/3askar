@@ -1,5 +1,14 @@
 #include "game.h"
 
+void player_box(GameState *state, int r, int c){
+    if (state->current_player == 1){
+        state->board[2 * r + 1][2 * c + 1] = 'A';
+    }
+    else if (state->current_player == 2){
+        state->board[2 * r + 1][2 * c + 1] = 'B';
+    }
+}
+
 void print_board(char board[9][11])
 {
     printf("  0 1 2 3 4 5\n");

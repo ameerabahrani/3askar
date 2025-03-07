@@ -62,6 +62,7 @@ int main() {
                         game.scores[game.current_player - 1]++;
                         game.remaining_boxes--;
                         boxCompleted = true;
+                        player_box(&game, r1 - 1, min_col);
                     }
 
                     if (r1 < ROWS && game.box_owner[r1][min_col] == 0 && check_box(&game, r1, min_col)){
@@ -69,6 +70,7 @@ int main() {
                         game.scores[game.current_player - 1]++;
                         game.remaining_boxes--;
                         boxCompleted = true;
+                        player_box(&game, r1, min_col);
                     }
 
                     if (!boxCompleted){
@@ -84,6 +86,7 @@ int main() {
                         game.scores[game.current_player - 1]++;
                         game.remaining_boxes--;
                         boxCompleted = true;
+                        player_box(&game, min_row, c1 - 1);
                     }
 
                     if (c1 < COLS && game.box_owner[min_row][c1] == 0 && check_box(&game, min_row, c1)){
@@ -91,6 +94,7 @@ int main() {
                         game.scores[game.current_player - 1]++;
                         game.remaining_boxes--;
                         boxCompleted = true;
+                        player_box(&game, min_row, c1);
                     }
 
                     if (!boxCompleted){
@@ -119,6 +123,7 @@ int main() {
     }
 
     int winner = (game.scores[0] > game.scores[1]) ? 1 : 2;
+    print_board(game.board);
     printf("Game over! Player %c wins!\n", (winner == 1) ? 'A' : 'B');
 
     return 0;
