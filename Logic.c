@@ -45,10 +45,11 @@ int process_move(GameState *state, int r1, int c1, int r2, int c2){
         if (state->horizontal_lines[r1][min_col])
             return -3;
 
-        if (r1 < 0 || r1 >= 5 || c1 < 0 || c1 >= 5)
+        if (r1 < 0 || r1 > 4 || c1 < 0 || c1 > 4)
             return -4; 
 
         state->horizontal_lines[r1][min_col] = true;
+        state->board[2 * r1 ][2 * min_col + 1] = '_';
         return 0;
     }
     if (line_type(r1, c1, r2, c2) == 1){ // vertical 
@@ -57,10 +58,11 @@ int process_move(GameState *state, int r1, int c1, int r2, int c2){
         if (state->vertical_lines[c1][min_row]) 
             return -3;
 
-        if (r1 < 0 || r1 >= 4 || c1 < 0 || c1 >= 4)
+        if (r1 < 0 || r1 > 5 || c1 < 0 || c1 > 5)
             return -4; 
 
         state->vertical_lines[min_row][c1] = true;
+        state->board[2 * min_row + 1][2 * c1] = '|';
         return 0; 
     }
     return -2;

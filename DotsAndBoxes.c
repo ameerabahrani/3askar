@@ -11,12 +11,10 @@ int main() {
             {false, false, false, false, false}
         },
         .vertical_lines = {
-            {false, false, false, false},
-            {false, false, false, false},
-            {false, false, false, false},
-            {false, false, false, false},
-            {false, false, false, false},
-            {false, false, false, false}
+            {false, false, false, false, false, false},
+            {false, false, false, false, false, false},
+            {false, false, false, false, false, false},
+            {false, false, false, false, false, false},
         },
         .box_owner = {
             {0, 0, 0, 0, 0},
@@ -55,7 +53,6 @@ int main() {
         int result = process_move(&game, r1, c1, r2, c2);
         switch (result) {
             case 0:
-                printLine(game.board, r1, c1, r2, c2);
                 if (check_box(&game, r1, c1)) {
                     game.box_owner[r1][c1] = game.current_player;
                     game.scores[game.current_player -1]++;
@@ -64,7 +61,7 @@ int main() {
                 else{
                     game.current_player = (game.current_player == 1) ? 2 : 1;
                 }
-
+                break;
             case -1:
                 printf("Not adjacent\n");
                 break;
