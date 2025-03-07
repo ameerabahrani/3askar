@@ -23,7 +23,7 @@ bool adjacent (int r1, int c1, int r2, int c2){
 bool check_box(GameState *state, int r, int c){
     if (r < 0 || r >= 4 || c < 0 || c >= 5)
         return false;
-    if (state->horizontal_lines[r][c] && state->horizontal_lines[r+1][c] && state->vertical_lines[c][r] && state->vertical_lines[c+1][r]){
+    if (state->horizontal_lines[r][c] && state->horizontal_lines[r+1][c] && state->vertical_lines[r][c] && state->vertical_lines[r][c+1]){
         return true;
     }
     return false;
@@ -55,14 +55,14 @@ int process_move(GameState *state, int r1, int c1, int r2, int c2){
     if (line_type(r1, c1, r2, c2) == 1){ // vertical 
         int min_row = (r1 < r2) ? r1 : r2;
 
-        if (state->vertical_lines[c1][min_row]) 
+        if (state->vertical_lines[min_row][c1]) 
             return -3;
 
-        if (r1 < 0 || r1 > 5 || c1 < 0 || c1 > 5)
+        if (min_row < 0 || min_row >= ROWS || c1 < 0 || c1 >= COLS)
             return -4; 
 
         state->vertical_lines[min_row][c1] = true;
-        state->board[2 * min_row + 1][2 * c1] = '|';
+        state->board[2 * min_row + 1][2 * c1 + 1] = '|';
         return 0; 
     }
     return -2;
