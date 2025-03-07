@@ -1,7 +1,23 @@
-#include <stdbool.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include "game.h"
+
+void print_board(char board[9][11])
+{
+    printf("  0 1 2 3 4 5\n");
+
+    for (int i = 0; i < 9; i++)
+    {
+        if(i % 2 == 0)
+            printf("%d ", i / 2);
+        else
+            printf("  ");
+        for (int j = 0; j < 11; j++)
+        {
+            
+            printf("%c", board[i][j]);
+        }
+        printf("\n");
+    }
+}
 
 int line_type(int r1, int c1, int r2, int c2){
     if (r1 == r2)

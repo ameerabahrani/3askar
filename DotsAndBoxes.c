@@ -39,7 +39,7 @@ int main() {
     };
 
     while (game.remaining_boxes > 0) {
-        PrintBoard(game.board);
+        print_board(game.board);
 
         if (game.current_player == 1) {
             printf("Player A's turn. Enter the row and column of the first dot (e.g., A0 -> 0 0) and second dot:\n");  
@@ -113,10 +113,13 @@ int main() {
         }
 
         printf("********************************************************************************\n");
-        printf("                    Player A score: %d\n", game.scores[0]);
-        printf("                    Player B score: %d\n", game.scores[1]);
+        printf("                            Player A score: %d\n", game.scores[0]);
+        printf("                            Player B score: %d\n", game.scores[1]);
         printf("********************************************************************************\n");
     }
+
+    int winner = (game.scores[0] > game.scores[1]) ? 1 : 2;
+    printf("Game over! Player %c wins!\n", (winner == 1) ? 'A' : 'B');
 
     return 0;
 }

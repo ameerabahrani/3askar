@@ -3,6 +3,8 @@
 
 #include <stdbool.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
 
 #define ROWS 4
 #define COLS 5
@@ -22,7 +24,6 @@ int line_type(int r1, int c1, int r2, int c2);
 bool adjacent (int r1, int c1, int r2, int c2);
 bool check_box(GameState *state, int r, int c);
 int process_move(GameState *state, int r1, int c1, int r2, int c2);
-void PrintBoard(char board[ROWS * 2 + 1][COLS * 2 + 1]);
-//void printLine(char board[ROWS * 2 + 1][COLS * 2 + 1], int x1, int y1, int x2, int y2);
+void print_board(char board[ROWS * 2 + 1][COLS * 2 + 1]);
 
 #endif
