@@ -8,7 +8,9 @@ void PrintBoard(char board[9][11])
     for (int i = 0; i < 9; i++)
     {
         if(i % 2 == 0)
-        printf("%d ", i / 2);
+            printf("%d ", i / 2);
+        else
+            printf("  ");
         for (int j = 0; j < 11; j++)
         {
             
@@ -33,4 +35,4 @@ void PrintBoard(char board[9][11])
     };
     PrintBoard(board);
     return 0;
-} 
+} */

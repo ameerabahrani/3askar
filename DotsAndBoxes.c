@@ -53,13 +53,49 @@ int main() {
         int result = process_move(&game, r1, c1, r2, c2);
         switch (result) {
             case 0:
-                if (check_box(&game, r1, c1)) {
-                    game.box_owner[r1][c1] = game.current_player;
-                    game.scores[game.current_player -1]++;
-                    game.remaining_boxes--;
+                if (line_type (r1, c1, r2, c2) == 0){ 
+                    bool boxCompleted = false;
+                    int min_col = (c1 < c2) ? c1 : c2;
+
+                    if (r1 > 0 && game.box_owner[r1 - 1][min_col] == 0 && check_box(&game, r1 - 1, min_col)){
+                        game.box_owner[r1 - 1][min_col] = game.current_player;
+                        game.scores[game.current_player - 1]++;
+                        game.remaining_boxes--;
+                        boxCompleted = true;
+                    }
+
+                    if (r1 < ROWS && game.box_owner[r1][min_col] == 0 && check_box(&game, r1, min_col)){
+                        game.box_owner[r1][min_col] = game.current_player;
+                        game.scores[game.current_player - 1]++;
+                        game.remaining_boxes--;
+                        boxCompleted = true;
+                    }
+
+                    if (!boxCompleted){
+                        game.current_player = (game.current_player == 1) ? 2 : 1;
+                    }
                 }
-                else{
-                    game.current_player = (game.current_player == 1) ? 2 : 1;
+                if (line_type(r1, c1, r2, c2) == 1){ 
+                    bool boxCompleted = false;
+                    int min_row = (r1 < r2) ? r1 : r2;
+
+                    if (c1 > 0 && game.box_owner[min_row][c1 - 1] == 0 && check_box(&game, min_row, c1 - 1)){
+                        game.box_owner[min_row][c1 - 1] = game.current_player;
+                        game.scores[game.current_player - 1]++;
+                        game.remaining_boxes--;
+                        boxCompleted = true;
+                    }
+
+                    if (c1 < COLS && game.box_owner[min_row][c1] == 0 && check_box(&game, min_row, c1)){
+                        game.box_owner[min_row][c1] = game.current_player;
+                        game.scores[game.current_player - 1]++;
+                        game.remaining_boxes--;
+                        boxCompleted = true;
+                    }
+
+                    if (!boxCompleted){
+                        game.current_player = (game.current_player == 1) ? 2 : 1;
+                    }
                 }
                 break;
             case -1:
