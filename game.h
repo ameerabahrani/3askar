@@ -10,7 +10,7 @@
 
 typedef struct {
     bool horizontal_lines[ROWS + 1][COLS];      //horizontal lines
-    bool vertical_lines[COLS + 1][ROWS];       //vertical lines
+    bool vertical_lines[ROWS][COLS + 1];       //vertical lines
     int box_owner[ROWS][COLS];            // 0=neutral  1/2=players
     int current_player;
     int scores[players];
@@ -23,6 +23,6 @@ bool adjacent (int r1, int c1, int r2, int c2);
 bool check_box(GameState *state, int r, int c);
 int process_move(GameState *state, int r1, int c1, int r2, int c2);
 void PrintBoard(char board[ROWS * 2 + 1][COLS * 2 + 1]);
-void printLine(char board[ROWS * 2 + 1][COLS * 2 + 1], int x1, int y1, int x2, int y2);
+//void printLine(char board[ROWS * 2 + 1][COLS * 2 + 1], int x1, int y1, int x2, int y2);
 
 #endif
