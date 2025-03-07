@@ -1,6 +1,5 @@
 #include "game.h"
 
-
 int main() {
                                 
     GameState game = {
