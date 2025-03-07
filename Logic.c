@@ -1,19 +1,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
-
-//Dots and Boxes game logic
-typedef struct {
-    // Grid state
-    bool horizontal_lines[4][5];  // 4 rows, 5 cols of horizontal lines
-    bool vertical_lines[5][4];    // 5 rows, 4 cols of vertical lines
-    int box_owner[4][5];          // 0=neutral, 1/2=players
-    
-    // Game state
-    int current_player;
-    int scores[2];
-    int remaining_boxes;
-} GameState;
+#include "game.h"
 
 int line_type(int r1, int c1, int r2, int c2){
     if (r1 == r2)
@@ -31,6 +19,16 @@ bool adjacent (int r1, int c1, int r2, int c2){
     
     return false;
 }
+
+bool check_box(GameState *state, int r, int c){
+    if (r < 0 || r >= 4 || c < 0 || c >= 5)
+        return false;
+    if (state->horizontal_lines[r][c] && state->horizontal_lines[r+1][c] && state->vertical_lines[c][r] && state->vertical_lines[c+1][r]){
+        return true;
+    }
+    return false;
+}
+
 //0 success
 //-1 not adjacent
 //-2 invalid line
@@ -41,39 +39,29 @@ int process_move(GameState *state, int r1, int c1, int r2, int c2){
         return -1; 
     if (line_type(r1, c1, r2, c2) == -1)
         return -2;
-    if (state->horizontal_lines[r1][c1] || state->vertical_lines[r1][c1])
-        return -3; 
     if (line_type(r1, c1, r2, c2) == 0){ // horizontal
+        int min_col = (c1 < c2) ? c1 : c2;
+
+        if (state->horizontal_lines[r1][min_col])
+            return -3;
+
         if (r1 < 0 || r1 >= 5 || c1 < 0 || c1 >= 5)
             return -4; 
-        int min_col = (c1 < c2) ? c1 : c2;
+
         state->horizontal_lines[r1][min_col] = true;
         return 0;
     }
     if (line_type(r1, c1, r2, c2) == 1){ // vertical 
+        int min_row = (r1 < r2) ? r1 : r2;
+
+        if (state->vertical_lines[c1][min_row]) 
+            return -3;
+
         if (r1 < 0 || r1 >= 4 || c1 < 0 || c1 >= 4)
             return -4; 
-        
-        int min_row = (r1 < r2) ? r1 : r2;
+
         state->vertical_lines[min_row][c1] = true;
         return 0; 
     }
     return -2;
 }
-
-bool check_box(GameState *state, int r, int c){
-    if (r < 0 || r >= 4 || c < 0 || c >= 5)
-        return false;
-    if (state->horizontal_lines[r][c] && state->horizontal_lines[r+1][c] && state->vertical_lines[r][c] && state->vertical_lines[r][c+1]){
-        return true;
-    }
-    return false;
-}
-
-int main(){
-}
-
-
-
-
-
