@@ -107,7 +107,7 @@ int main() {
 
     int winner = (game.scores[0] > game.scores[1]) ? 1 : 2;
     print_board(game.board);
-    printf("Game over!" + (game.scores[0] == game.scores[1]) ? "Tie!" : "Player %c wins!\n", (winner == 1) ? 'A' : 'B');
+    printf("Game over! %s", (game.scores[0] == game.scores[1]) ? "Tie!\n" : ((winner == 1) ? "Player A wins!\n" : "Player B wins!\n"));
 
     return 0;
 }
