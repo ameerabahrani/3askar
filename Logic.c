@@ -9,8 +9,7 @@ void player_box(GameState *state, int r, int c){
     }
 }
 
-void print_board(char board[9][11])
-{
+void print_board(char board[9][11]){
     printf("  0 1 2 3 4 5\n");
 
     for (int i = 0; i < 9; i++)

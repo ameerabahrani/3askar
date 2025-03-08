@@ -1,27 +1,10 @@
 #include "game.h"
 
-
 int main() {                         
     GameState game = {
-        .horizontal_lines = {
-            {false, false, false, false, false},
-            {false, false, false, false, false},
-            {false, false, false, false, false},
-            {false, false, false, false, false},
-            {false, false, false, false, false}
-        },
-        .vertical_lines = {
-            {false, false, false, false, false, false},
-            {false, false, false, false, false, false},
-            {false, false, false, false, false, false},
-            {false, false, false, false, false, false},
-        },
-        .box_owner = {
-            {0, 0, 0, 0, 0},
-            {0, 0, 0, 0, 0},
-            {0, 0, 0, 0, 0},
-            {0, 0, 0, 0, 0}
-        },
+        .horizontal_lines = {[0 ... ROWS] = {[0 ... COLS - 1] = false}},
+        .vertical_lines = {[0 ... ROWS - 1] = {[0 ... COLS] = false}},
+        .box_owner = {[0 ... ROWS - 1] = {[0 ... COLS - 1] = 0}},
         .current_player = 1,
         .scores = {0, 0},
         .remaining_boxes = ROWS * COLS,
