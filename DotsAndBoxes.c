@@ -22,17 +22,29 @@ int main() {
         }
     };
 
-    char modeInput[256];
     int mode;
-    printf("Choose game mode:\n");
-    printf("1) Two Players (Human vs. Human)\n");
-    printf("2) Human vs. Bot (Easy Level)\n");
+    while (1) { // Loop until valid input
+        printf("Choose game mode:\n");
+        printf("1) Two Players (Human vs. Human)\n");
+        printf("2) Human vs. Bot (Easy Level)\n");
     
-    fgets(modeInput, sizeof(modeInput), stdin);
-    int mode;
-    if (sscanf(modeInput, "%d", &mode) != 1) {
-        //handle invalid input  
-    }
+        char modeInput[256];
+        if (fgets(modeInput, sizeof(modeInput), stdin) == NULL) {
+            // EOF or error; exit or handle however you like
+            printf("Error reading input. Exiting.\n");
+            return 1;
+        }
+    
+        // parsing
+        if (sscanf(modeInput, "%d", &mode) == 1 && (mode == 1 || mode == 2)) {
+            // Valid integer and it's 1 or 2
+            // break out of the loop
+            break;
+        } else {
+            printf("Invalid input. Please enter 1 or 2.\n");
+        }
+    }   
+    
     
     srand(time(NULL)); // Seed the random generator for bot
     while (game.remaining_boxes > 0) { // game loop

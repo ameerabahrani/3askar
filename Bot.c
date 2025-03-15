@@ -99,7 +99,7 @@ void bot_move(GameState *state) {
             break;
         } else {
             //invalid move try again
-            //continue;
+            continue;
         }
 
     }
