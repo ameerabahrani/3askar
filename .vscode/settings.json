@@ -58,6 +58,8 @@
   "C_Cpp_Runner.msvcSecureNoWarnings": false,
   "files.associations": {
     "math.h": "c",
-    "stdbool.h": "c"
+    "stdbool.h": "c",
+    "time.h": "c",
+    "game.h": "c"
   }
 }

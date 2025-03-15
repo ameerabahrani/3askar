@@ -30,5 +30,6 @@ void print_board(char board[ROWS * 2 + 1][COLS * 2 + 1]);
 void player_box(GameState *state, int r, int c);
 void normalize_input(char *str);
 void bot_move(GameState *state);
+void claim_box(GameState *state, int r, int c, bool *boxCompleted);
 
 #endif

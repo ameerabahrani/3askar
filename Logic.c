@@ -1,5 +1,13 @@
 #include "game.h"
 
+void claim_box(GameState *state, int r, int c, bool *boxCompleted){
+    state->box_owner[r][c] = state->current_player;
+    state->scores[state->current_player - 1]++;
+    state->remaining_boxes--;
+    *boxCompleted = true;
+    player_box(state, r, c);
+}
+
 void player_box(GameState *state, int r, int c){ // print the player's letter in the box
     if (state->current_player == 1){
         state->board[2 * r + 1][2 * c + 1] = 'A';
@@ -107,3 +115,4 @@ void normalize_input(char *str) {
     // Convert to lowercase
     for (char *p = str; *p; p++) *p = tolower(*p);
 }
+

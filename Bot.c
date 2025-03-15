@@ -1,6 +1,5 @@
-#include <time.h>
-#include <stdlib.h>
 #include "game.h"
+#include <time.h>
 
 void bot_move(GameState *state) {
    

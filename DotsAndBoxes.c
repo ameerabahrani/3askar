@@ -24,7 +24,7 @@ int main() {
 
     int mode;
     while (1) { // Loop until valid input
-        printf("Choose game mode:\n");
+        printf("Choose game mode or \"Exit\":\n");
         printf("1) Two Players (Human vs. Human)\n");
         printf("2) Human vs. Bot (Easy Level)\n");
     
@@ -34,7 +34,6 @@ int main() {
             printf("Error reading input. Exiting.\n");
             return 1;
         }
-    
         // parsing
         if (sscanf(modeInput, "%d", &mode) == 1 && (mode == 1 || mode == 2)) {
             // Valid integer and it's 1 or 2
@@ -43,8 +42,7 @@ int main() {
         } else {
             printf("Invalid input. Please enter 1 or 2.\n");
         }
-    }   
-    
+    }   // ADD EXITT HASHEM
     
     srand(time(NULL)); // Seed the random generator for bot
     while (game.remaining_boxes > 0) { // game loop
@@ -73,52 +71,24 @@ int main() {
                             int min_col = (c1 < c2) ? c1 : c2; 
     
                             // Check if the box above is checked to account for two boxes being completed at once
-                            if (r1 > 0 && game.box_owner[r1 - 1][min_col] == 0 && check_box(&game, r1 - 1, min_col)){ 
-                                game.box_owner[r1 - 1][min_col] = game.current_player;
-                                game.scores[game.current_player - 1]++;
-                                game.remaining_boxes--;
-                                boxCompleted = true;
-                                player_box(&game, r1 - 1, min_col);
-                            }
+                            if (r1 > 0 && game.box_owner[r1 - 1][min_col] == 0 && check_box(&game, r1 - 1, min_col)){claim_box(&game, r1 - 1, min_col, &boxCompleted);}
     
                             // Check if the box down is checked to account for two boxes being completed at once
-                            if (r1 < ROWS && game.box_owner[r1][min_col] == 0 && check_box(&game, r1, min_col)){ 
-                                game.box_owner[r1][min_col] = game.current_player;
-                                game.scores[game.current_player - 1]++;
-                                game.remaining_boxes--;
-                                boxCompleted = true;
-                                player_box(&game, r1, min_col);
-                            }
+                            if (r1 < ROWS && game.box_owner[r1][min_col] == 0 && check_box(&game, r1, min_col)){claim_box(&game, r1, min_col, &boxCompleted);}
     
-                            if (!boxCompleted){ 
-                                game.current_player = (game.current_player == 1) ? 2 : 1;
-                            }
+                            if (!boxCompleted){game.current_player = (game.current_player == 1) ? 2 : 1;}
                         }
                         if (linetype == 1){ 
                             bool boxCompleted = false;
                             int min_row = (r1 < r2) ? r1 : r2;
     
                             // Check if the box to the left is checked to account for two boxes being completed at once
-                            if (c1 > 0 && game.box_owner[min_row][c1 - 1] == 0 && check_box(&game, min_row, c1 - 1)){ 
-                                game.box_owner[min_row][c1 - 1] = game.current_player;
-                                game.scores[game.current_player - 1]++;
-                                game.remaining_boxes--;
-                                boxCompleted = true;
-                                player_box(&game, min_row, c1 - 1);
-                            }
-    
+                            if (c1 > 0 && game.box_owner[min_row][c1 - 1] == 0 && check_box(&game, min_row, c1 - 1)){claim_box(&game, min_row, c1 - 1, &boxCompleted);}
+
                             // Check if the box to the right is checked to account for two boxes being completed at once
-                            if (c1 < COLS && game.box_owner[min_row][c1] == 0 && check_box(&game, min_row, c1)){ 
-                                game.box_owner[min_row][c1] = game.current_player;
-                                game.scores[game.current_player - 1]++;
-                                game.remaining_boxes--;
-                                boxCompleted = true;
-                                player_box(&game, min_row, c1);
-                            }
-    
-                            if (!boxCompleted){
-                                game.current_player = (game.current_player == 1) ? 2 : 1;
-                            }
+                            if (c1 < COLS && game.box_owner[min_row][c1] == 0 && check_box(&game, min_row, c1)){claim_box(&game, min_row, c1, &boxCompleted);}
+
+                            if (!boxCompleted){game.current_player = (game.current_player == 1) ? 2 : 1;}
                         }
                         break;
                     case -1:
@@ -135,9 +105,8 @@ int main() {
                         break;
                 }
             }
-
-        
-        } else {
+        } 
+        else {
             if(mode == 1) {
                 printf("Player B's turn. Enter the row and column of the first dot (e.g., A0 -> 0 0) and second dot or \"exit\":\n");
                 
@@ -150,7 +119,8 @@ int main() {
                 int r1, c1, r2, c2;
                 if (sscanf(input, "%d %d %d %d", &r1, &c1, &r2, &c2) != 4) {
                     printf("Invalid input. Please enter 4 integers.\n");
-                } else {
+                } 
+                else {
                     int result = process_move(&game, r1, c1, r2, c2); // Check if the move is valid and update the bool arrays
                     int linetype = line_type(r1, c1, r2, c2);
                     switch (result) {
@@ -160,52 +130,26 @@ int main() {
                                 int min_col = (c1 < c2) ? c1 : c2; 
         
                                 // Check if the box above is checked to account for two boxes being completed at once
-                                if (r1 > 0 && game.box_owner[r1 - 1][min_col] == 0 && check_box(&game, r1 - 1, min_col)){ 
-                                    game.box_owner[r1 - 1][min_col] = game.current_player;
-                                    game.scores[game.current_player - 1]++;
-                                    game.remaining_boxes--;
-                                    boxCompleted = true;
-                                    player_box(&game, r1 - 1, min_col);
-                                }
+                                if (r1 > 0 && game.box_owner[r1 - 1][min_col] == 0 && check_box(&game, r1 - 1, min_col)){claim_box(&game, r1 - 1, min_col, &boxCompleted);}
         
                                 // Check if the box down is checked to account for two boxes being completed at once
-                                if (r1 < ROWS && game.box_owner[r1][min_col] == 0 && check_box(&game, r1, min_col)){ 
-                                    game.box_owner[r1][min_col] = game.current_player;
-                                    game.scores[game.current_player - 1]++;
-                                    game.remaining_boxes--;
-                                    boxCompleted = true;
-                                    player_box(&game, r1, min_col);
-                                }
+                                if (r1 < ROWS && game.box_owner[r1][min_col] == 0 && check_box(&game, r1, min_col)){claim_box(&game, r1, min_col, &boxCompleted);}
         
-                                if (!boxCompleted){ 
-                                    game.current_player = (game.current_player == 1) ? 2 : 1;
-                                }
+                                if (!boxCompleted){game.current_player = (game.current_player == 1) ? 2 : 1;}
                             }
                             if (linetype == 1){ 
                                 bool boxCompleted = false;
                                 int min_row = (r1 < r2) ? r1 : r2;
         
                                 // Check if the box to the left is checked to account for two boxes being completed at once
-                                if (c1 > 0 && game.box_owner[min_row][c1 - 1] == 0 && check_box(&game, min_row, c1 - 1)){ 
-                                    game.box_owner[min_row][c1 - 1] = game.current_player;
-                                    game.scores[game.current_player - 1]++;
-                                    game.remaining_boxes--;
-                                    boxCompleted = true;
-                                    player_box(&game, min_row, c1 - 1);
-                                }
+                                if (c1 > 0 && game.box_owner[min_row][c1 - 1] == 0 && check_box(&game, min_row, c1 - 1)){claim_box(&game, min_row, c1 - 1, &boxCompleted);}
         
                                 // Check if the box to the right is checked to account for two boxes being completed at once
                                 if (c1 < COLS && game.box_owner[min_row][c1] == 0 && check_box(&game, min_row, c1)){ 
-                                    game.box_owner[min_row][c1] = game.current_player;
-                                    game.scores[game.current_player - 1]++;
-                                    game.remaining_boxes--;
-                                    boxCompleted = true;
-                                    player_box(&game, min_row, c1);
+                                    claim_box(&game, min_row, c1, &boxCompleted);
                                 }
         
-                                if (!boxCompleted){
-                                    game.current_player = (game.current_player == 1) ? 2 : 1;
-                                }
+                                if (!boxCompleted){game.current_player = (game.current_player == 1) ? 2 : 1;}
                             }
                             break;
                         case -1:
@@ -221,18 +165,13 @@ int main() {
                             printf("Invalid coordinates\n");
                             break;
                     }
-
                 }
-
-            } else {
+            } 
+            else {
                 printf("Player B (Bot) is thinking...\n");
                 bot_move(&game);
             }
         }
-
-        
-        
-
         printf("********************************************************************************\n");
         printf("                            Player A score: %d\n", game.scores[0]);
         printf("                            Player B score: %d\n", game.scores[1]);
