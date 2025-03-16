@@ -67,28 +67,10 @@ int main() {
                 switch (result) {
                     case 0:
                         if (linetype == 0){ // Horizontal line
-                            bool boxCompleted = false;
-                            int min_col = (c1 < c2) ? c1 : c2; 
-    
-                            // Check if the box above is checked to account for two boxes being completed at once
-                            if (r1 > 0 && game.box_owner[r1 - 1][min_col] == 0 && check_box(&game, r1 - 1, min_col)){claim_box(&game, r1 - 1, min_col, &boxCompleted);}
-    
-                            // Check if the box down is checked to account for two boxes being completed at once
-                            if (r1 < ROWS && game.box_owner[r1][min_col] == 0 && check_box(&game, r1, min_col)){claim_box(&game, r1, min_col, &boxCompleted);}
-    
-                            if (!boxCompleted){game.current_player = (game.current_player == 1) ? 2 : 1;}
+                            handle_horizontal_line(&game, r1, c1, r2);
                         }
-                        if (linetype == 1){ 
-                            bool boxCompleted = false;
-                            int min_row = (r1 < r2) ? r1 : r2;
-    
-                            // Check if the box to the left is checked to account for two boxes being completed at once
-                            if (c1 > 0 && game.box_owner[min_row][c1 - 1] == 0 && check_box(&game, min_row, c1 - 1)){claim_box(&game, min_row, c1 - 1, &boxCompleted);}
-
-                            // Check if the box to the right is checked to account for two boxes being completed at once
-                            if (c1 < COLS && game.box_owner[min_row][c1] == 0 && check_box(&game, min_row, c1)){claim_box(&game, min_row, c1, &boxCompleted);}
-
-                            if (!boxCompleted){game.current_player = (game.current_player == 1) ? 2 : 1;}
+                        if (linetype == 1){ // Vertical line
+                            handle_vertical_line(&game, r1, c1, r2);
                         }
                         break;
                     case -1:
@@ -126,30 +108,10 @@ int main() {
                     switch (result) {
                         case 0:
                             if (linetype == 0){ // Horizontal line
-                                bool boxCompleted = false;
-                                int min_col = (c1 < c2) ? c1 : c2; 
-        
-                                // Check if the box above is checked to account for two boxes being completed at once
-                                if (r1 > 0 && game.box_owner[r1 - 1][min_col] == 0 && check_box(&game, r1 - 1, min_col)){claim_box(&game, r1 - 1, min_col, &boxCompleted);}
-        
-                                // Check if the box down is checked to account for two boxes being completed at once
-                                if (r1 < ROWS && game.box_owner[r1][min_col] == 0 && check_box(&game, r1, min_col)){claim_box(&game, r1, min_col, &boxCompleted);}
-        
-                                if (!boxCompleted){game.current_player = (game.current_player == 1) ? 2 : 1;}
+                                handle_horizontal_line(&game, r1, c1, r2);
                             }
                             if (linetype == 1){ 
-                                bool boxCompleted = false;
-                                int min_row = (r1 < r2) ? r1 : r2;
-        
-                                // Check if the box to the left is checked to account for two boxes being completed at once
-                                if (c1 > 0 && game.box_owner[min_row][c1 - 1] == 0 && check_box(&game, min_row, c1 - 1)){claim_box(&game, min_row, c1 - 1, &boxCompleted);}
-        
-                                // Check if the box to the right is checked to account for two boxes being completed at once
-                                if (c1 < COLS && game.box_owner[min_row][c1] == 0 && check_box(&game, min_row, c1)){ 
-                                    claim_box(&game, min_row, c1, &boxCompleted);
-                                }
-        
-                                if (!boxCompleted){game.current_player = (game.current_player == 1) ? 2 : 1;}
+                                handle_vertical_line(&game, r1, c1, r2);
                             }
                             break;
                         case -1:

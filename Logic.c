@@ -8,6 +8,46 @@ void claim_box(GameState *state, int r, int c, bool *boxCompleted){
     player_box(state, r, c);
 }
 
+void handle_horizontal_line(GameState *state, int r1, int c1, int c2) {
+    bool boxCompleted = false;
+    int min_col = (c1 < c2) ? c1 : c2;
+
+    // Check if the box above is checked to account for two boxes being completed at once
+    if (r1 > 0 && state->box_owner[r1 - 1][min_col] == 0 && check_box(state, r1 - 1, min_col)) {
+        claim_box(state, r1 - 1, min_col, &boxCompleted);
+    }
+
+    // Check if the box down is checked to account for two boxes being completed at once
+    if (r1 < ROWS && state->box_owner[r1][min_col] == 0 && check_box(state, r1, min_col)) {
+        claim_box(state, r1, min_col, &boxCompleted);
+    }
+
+    // Switch player if no boxes were completed
+    if (!boxCompleted) {
+        state->current_player = (state->current_player == 1) ? 2 : 1;
+    }
+}
+
+void handle_vertical_line(GameState *state, int r1, int c1, int r2) {
+    bool boxCompleted = false;
+    int min_row = (r1 < r2) ? r1 : r2;
+
+    // Check if the box to the left is checked to account for two boxes being completed at once
+    if (c1 > 0 && state->box_owner[min_row][c1 - 1] == 0 && check_box(state, min_row, c1 - 1)) {
+        claim_box(state, min_row, c1 - 1, &boxCompleted);
+    }
+
+    // Check if the box to the right is checked to account for two boxes being completed at once
+    if (c1 < COLS && state->box_owner[min_row][c1] == 0 && check_box(state, min_row, c1)) {
+        claim_box(state, min_row, c1, &boxCompleted);
+    }
+
+    // Switch player if no boxes were completed
+    if (!boxCompleted) {
+        state->current_player = (state->current_player == 1) ? 2 : 1;
+    }
+}
+
 void player_box(GameState *state, int r, int c){ // print the player's letter in the box
     if (state->current_player == 1){
         state->board[2 * r + 1][2 * c + 1] = 'A';

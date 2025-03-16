@@ -31,5 +31,7 @@ void player_box(GameState *state, int r, int c);
 void normalize_input(char *str);
 void bot_move(GameState *state);
 void claim_box(GameState *state, int r, int c, bool *boxCompleted);
+void handle_horizontal_line(GameState *state, int r1, int c1, int c2);
+void handle_vertical_line(GameState *state, int r1, int c1, int r2);
 
 #endif
