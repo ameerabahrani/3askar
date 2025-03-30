@@ -25,8 +25,9 @@ int main() {
     int mode;
     while (1) { // Loop until valid input
         printf("Choose game mode or \"Exit\":\n");
-        printf("1) Two Players (Human vs. Human)\n");
-        printf("2) Human vs. Bot (Easy Level)\n");
+        printf("(1) Two Players (Human vs. Human)\n");
+        printf("(2) Human vs. Bot (Easy Level)\n");
+        printf("(3) Human vs. Bot (Medium Level)\n");
     
         char modeInput[256];
         if (fgets(modeInput, sizeof(modeInput), stdin) == NULL) {
@@ -35,12 +36,12 @@ int main() {
             return 1;
         }
         // parsing
-        if (sscanf(modeInput, "%d", &mode) == 1 && (mode == 1 || mode == 2)) {
-            // Valid integer and it's 1 or 2
+        if (sscanf(modeInput, "%d", &mode) == 1 && (mode == 1 || mode == 2 || mode == 3)) {
+            // Valid integer and it's 1, 2, or 3
             // break out of the loop
             break;
         } else {
-            printf("Invalid input. Please enter 1 or 2.\n");
+            printf("Invalid input. Please enter 1, 2, or 3.\n");
         }
     }   // ADD EXITT HASHEM
     
@@ -66,10 +67,10 @@ int main() {
                 int linetype = line_type(r1, c1, r2, c2);
                 switch (result) {
                     case 0:
-                        if (linetype == 0){ // Horizontal line
+                        if (linetype == HORIZONTAL){ // Horizontal line
                             handle_horizontal_line(&game, r1, c1, r2);
                         }
-                        if (linetype == 1){ // Vertical line
+                        if (linetype == VERTICAL){ // Vertical line
                             handle_vertical_line(&game, r1, c1, r2);
                         }
                         break;
@@ -107,10 +108,10 @@ int main() {
                     int linetype = line_type(r1, c1, r2, c2);
                     switch (result) {
                         case 0:
-                            if (linetype == 0){ // Horizontal line
+                            if (linetype == HORIZONTAL){ // Horizontal line
                                 handle_horizontal_line(&game, r1, c1, r2);
                             }
-                            if (linetype == 1){ 
+                            if (linetype == VERTICAL){  // Vertical line
                                 handle_vertical_line(&game, r1, c1, r2);
                             }
                             break;
@@ -129,9 +130,13 @@ int main() {
                     }
                 }
             } 
-            else {
+            else if (mode == 2) { // Easy bot
                 printf("Player B (Bot) is thinking...\n");
-                bot_move(&game);
+                easy_bot_move(&game);
+            }
+            else if (mode == 3) { // Medium bot
+                printf("Player B (Bot) is thinking...\n");
+                medium_bot_move(&game); 
             }
         }
         printf("********************************************************************************\n");

@@ -22,6 +22,8 @@ typedef struct {
     char board[ROWS * 2 + 1][COLS * 2 + 1]; //9×11 board for printing dots and spaces
 } GameState;
 
+enum {HORIZONTAL, VERTICAL}; // for line type
+
 int line_type(int r1, int c1, int r2, int c2);
 bool adjacent (int r1, int c1, int r2, int c2);
 bool check_box(GameState *state, int r, int c);
@@ -29,7 +31,9 @@ int process_move(GameState *state, int r1, int c1, int r2, int c2);
 void print_board(char board[ROWS * 2 + 1][COLS * 2 + 1]);
 void player_box(GameState *state, int r, int c);
 void normalize_input(char *str);
-void bot_move(GameState *state);
+void easy_bot_move(GameState *state);
+void medium_bot_move(GameState *state);
+int simulate(GameState state, int r1, int c1, int r2, int c2);
 void claim_box(GameState *state, int r, int c, bool *boxCompleted);
 void handle_horizontal_line(GameState *state, int r1, int c1, int c2);
 void handle_vertical_line(GameState *state, int r1, int c1, int r2);

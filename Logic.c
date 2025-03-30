@@ -77,9 +77,9 @@ void print_board(char board[9][11]){ // print the board
 
 int line_type(int r1, int c1, int r2, int c2){ // check if the line is horizontal or vertical
     if (r1 == r2)
-        return 0; // horizontal
+        return HORIZONTAL; // horizontal
     if (c1 == c2)
-        return 1; // vertical
+        return VERTICAL; // vertical
     return -1; // invalid
 }
 
@@ -111,7 +111,7 @@ int process_move(GameState *state, int r1, int c1, int r2, int c2){ // process t
         return -1; 
     if (line_type(r1, c1, r2, c2) == -1)
         return -2;
-    if (line_type(r1, c1, r2, c2) == 0){ // horizontal
+    if (line_type(r1, c1, r2, c2) == HORIZONTAL){ // horizontal
         int min_col = (c1 < c2) ? c1 : c2;
 
         if (r1 < 0 || r1 > 4 || c1 < 0 || c1 > 4)
@@ -125,7 +125,7 @@ int process_move(GameState *state, int r1, int c1, int r2, int c2){ // process t
         state->board[2 * r1 ][2 * min_col + 1] = '-';
         return 0;
     }
-    if (line_type(r1, c1, r2, c2) == 1){ // vertical 
+    if (line_type(r1, c1, r2, c2) == VERTICAL){ // vertical 
         int min_row = (r1 < r2) ? r1 : r2;
 
         if (min_row < 0 || min_row > ROWS || c1 < 0 || c1 > COLS)
