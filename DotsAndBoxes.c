@@ -43,7 +43,7 @@ int main() {
         } else {
             printf("Invalid input. Please enter 1, 2, or 3.\n");
         }
-    }   // ADD EXITT HASHEM
+    }
     
     srand(time(NULL)); // Seed the random generator for bot
     while (game.remaining_boxes > 0) { // game loop
