@@ -131,3 +131,7 @@ void medium_bot_move(GameState *state) { // medium bot that plays a move that wi
     }
 }
 
+void hard_bot_move(GameState *state){
+    printf("Hard bot is not implemented yet.\n");
+    
+}

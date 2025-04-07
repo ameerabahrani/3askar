@@ -6,6 +6,20 @@ void claim_box(GameState *state, int r, int c, bool *boxCompleted){
     state->remaining_boxes--;
     *boxCompleted = true;
     player_box(state, r, c);
+
+    int row = 2 * r + 1;
+    int col = 2 * c + 1;
+    int color = state->current_player;
+    
+    // Update adjacent lines (check bounds to avoid out-of-range errors)
+    if (row - 1 >= 0)
+        state->board[row - 1][col].color = color; // Top
+    if (row + 1 < ROWS * 2 + 1)
+        state->board[row + 1][col].color = color; // Bottom
+    if (col - 1 >= 0)
+        state->board[row][col - 1].color = color; // Left
+    if (col + 1 < COLS * 2 + 1)
+        state->board[row][col + 1].color = color; // Right
 }
 
 void handle_horizontal_line(GameState *state, int r1, int c1, int c2) {
@@ -50,30 +64,46 @@ void handle_vertical_line(GameState *state, int r1, int c1, int r2) {
 
 void player_box(GameState *state, int r, int c){ // print the player's letter in the box
     if (state->current_player == 1){
-        state->board[2 * r + 1][2 * c + 1] = 'A';
+        state->board[2 * r + 1][2 * c + 1].symbol = 'A';
+        state->board[2 * r + 1][2 * c + 1].color = 1; // set the color of the box to the current player
     }
     else if (state->current_player == 2){
-        state->board[2 * r + 1][2 * c + 1] = 'B';
+        state->board[2 * r + 1][2 * c + 1].symbol = 'B';
+        state->board[2 * r + 1][2 * c + 1].color = 2; // set the color of the box to the current player
     }
 }
 
-void print_board(char board[9][11]){ // print the board
-    printf("  0 1 2 3 4 5\n");
-
-    for (int i = 0; i < 9; i++)
-    {
-        if(i % 2 == 0)
+void print_board(Cell board[ROWS * 2 + 1][COLS * 2 + 1]) {
+    int rows = ROWS * 2 + 1;
+    int cols = COLS * 2 + 1;
+    
+    // Print the column header (0 to COLS)
+    printf("  ");
+    for (int j = 0; j <= COLS; j++) {
+        printf("%d ", j);
+    }
+    printf("\n");
+    
+    // Print the board rows with row coordinates for even rows
+    for (int i = 0; i < rows; i++) {
+        if (i % 2 == 0)
             printf("%d ", i / 2);
         else
             printf("  ");
-        for (int j = 0; j < 11; j++)
-        {
-            
-            printf("%c", board[i][j]);
+        
+        for (int j = 0; j < cols; j++) {
+            if (board[i][j].color == 1)
+                printf(BLUE_COLOR "%c" RESET_COLOR, board[i][j].symbol);
+            else if (board[i][j].color == 2)
+                printf(RED_COLOR "%c" RESET_COLOR, board[i][j].symbol);
+            else
+                printf("%c", board[i][j].symbol);
         }
         printf("\n");
     }
 }
+
+
 
 int line_type(int r1, int c1, int r2, int c2){ // check if the line is horizontal or vertical
     if (r1 == r2)
@@ -122,7 +152,8 @@ int process_move(GameState *state, int r1, int c1, int r2, int c2){ // process t
             return -3;
 
         state->horizontal_lines[r1][min_col] = true;
-        state->board[2 * r1 ][2 * min_col + 1] = '-';
+        state->board[2 * r1 ][2 * min_col + 1].symbol = '-';
+        state->board[2 * r1 ][2 * min_col + 1].color = state->current_player; // set the color of the line to the current player
         return 0;
     }
     if (line_type(r1, c1, r2, c2) == VERTICAL){ // vertical 
@@ -135,7 +166,8 @@ int process_move(GameState *state, int r1, int c1, int r2, int c2){ // process t
             return -3;
 
         state->vertical_lines[min_row][c1] = true;
-        state->board[2 * min_row + 1][2 * c1] = '|';
+        state->board[2 * min_row + 1][2 * c1].symbol = '|';
+        state->board[2 * min_row + 1][2 * c1].color = state->current_player; // set the color of the line to the current player
         return 0; 
     }
     return -2;
@@ -154,5 +186,33 @@ void normalize_input(char *str) {
 
     // Convert to lowercase
     for (char *p = str; *p; p++) *p = tolower(*p);
+}
+
+void init_board(GameState *state){
+    int rows = ROWS * 2 + 1;
+    int cols = COLS * 2 + 1;
+
+    for (int i = 0; i < rows; i++){
+        for (int j = 0; j < cols; j++){
+            state->board[i][j].color = 0; // neutral color
+
+            if (i % 2 == 0){
+                if (j % 2 == 0){
+                    state->board[i][j].symbol = '.'; 
+                }
+                else{
+                    state->board[i][j].symbol = ' '; // horizontal line
+                }
+            }
+            else{
+                if (j % 2 == 0){
+                    state->board[i][j].symbol = ' '; 
+                }
+                else{
+                    state->board[i][j].symbol = ' '; // empty space
+                }
+            }
+        }
+    }
 }
 

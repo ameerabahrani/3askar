@@ -9,18 +9,8 @@ int main() {
         .current_player = 1,
         .scores = {0, 0},
         .remaining_boxes = ROWS * COLS,
-        .board = {
-            {'.', ' ', '.', ' ', '.', ' ', '.', ' ', '.', ' ', '.'},
-            {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
-            {'.', ' ', '.', ' ', '.', ' ', '.', ' ', '.', ' ', '.'},
-            {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
-            {'.', ' ', '.', ' ', '.', ' ', '.', ' ', '.', ' ', '.'},
-            {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
-            {'.', ' ', '.', ' ', '.', ' ', '.', ' ', '.', ' ', '.'},
-            {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
-            {'.', ' ', '.', ' ', '.', ' ', '.', ' ', '.', ' ', '.'}
-        }
     };
+    init_board(&game); // Initialize the board with dots and spaces
 
     int mode;
     while (1) { // Loop until valid input
@@ -28,6 +18,7 @@ int main() {
         printf("(1) Two Players (Human vs. Human)\n");
         printf("(2) Human vs. Bot (Easy Level)\n");
         printf("(3) Human vs. Bot (Medium Level)\n");
+        printf("(4) Human vs. Bot (Hard Level)\n");
     
         char modeInput[256];
         if (fgets(modeInput, sizeof(modeInput), stdin) == NULL) {
@@ -36,12 +27,12 @@ int main() {
             return 1;
         }
         // parsing
-        if (sscanf(modeInput, "%d", &mode) == 1 && (mode == 1 || mode == 2 || mode == 3)) {
+        if (sscanf(modeInput, "%d", &mode) == 1 && (mode == 1 || mode == 2 || mode == 3 || mode == 4)) {
             // Valid integer and it's 1, 2, or 3
             // break out of the loop
             break;
         } else {
-            printf("Invalid input. Please enter 1, 2, or 3.\n");
+            printf("Invalid input. Please enter 1, 2, 3, 4.\n");
         }
     }
     
@@ -50,7 +41,7 @@ int main() {
         print_board(game.board);
 
         if (game.current_player == 1) { //Player A always human
-            printf("Player A's turn. Enter the row and column of the first dot (e.g., A0 -> 0 0) and second dot or \"exit\":\n"); 
+            printf(BLUE_COLOR "Player A's " RESET_COLOR "turn. Enter the row and column of the first dot (e.g., A0 -> 0 0) and second dot or \"exit\":\n"); 
 
             char input[256];
             if (fgets(input, sizeof(input), stdin) == NULL) break;
@@ -91,7 +82,7 @@ int main() {
         } 
         else {
             if(mode == 1) {
-                printf("Player B's turn. Enter the row and column of the first dot (e.g., A0 -> 0 0) and second dot or \"exit\":\n");
+                printf(RED_COLOR "Player B's " RESET_COLOR "turn. Enter the row and column of the first dot (e.g., A0 -> 0 0) and second dot or \"exit\":\n");
                 
                 char input[256];
                 if (fgets(input, sizeof(input), stdin) == NULL) break;
@@ -131,23 +122,27 @@ int main() {
                 }
             } 
             else if (mode == 2) { // Easy bot
-                printf("Player B (Bot) is thinking...\n");
+                printf(RED_COLOR "Player B (Bot)" RESET_COLOR" is thinking...\n");
                 easy_bot_move(&game);
             }
             else if (mode == 3) { // Medium bot
-                printf("Player B (Bot) is thinking...\n");
+                printf(RED_COLOR "Player B (Bot)" RESET_COLOR" is thinking...\n");
                 medium_bot_move(&game); 
+            }
+            else if (mode == 4) { // Hard bot
+                printf(RED_COLOR "Player B (Bot)" RESET_COLOR" is thinking...\n");
+                hard_bot_move(&game);
             }
         }
         printf("********************************************************************************\n");
-        printf("                            Player A score: %d\n", game.scores[0]);
-        printf("                            Player B score: %d\n", game.scores[1]);
+        printf(BLUE_COLOR"                            Player A score: %d\n" RESET_COLOR, game.scores[0]);
+        printf(RED_COLOR"                            Player B score: %d\n" RESET_COLOR, game.scores[1]);
         printf("********************************************************************************\n");
     }
 
     int winner = (game.scores[0] > game.scores[1]) ? 1 : 2;
     print_board(game.board);
-    printf("Game over! %s", (game.scores[0] == game.scores[1]) ? "Tie!\n" : ((winner == 1) ? "Player A wins!\n" : "Player B wins!\n"));
+    printf("Game over! %s", (game.scores[0] == game.scores[1]) ? "Tie!\n" : ((winner == 1) ? BLUE_COLOR "Player A wins!\n" RESET_COLOR:  RED_COLOR "Player B wins!\n" RESET_COLOR));
 
     return 0;
 }
