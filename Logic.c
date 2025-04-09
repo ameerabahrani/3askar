@@ -104,7 +104,6 @@ void print_board(Cell board[ROWS * 2 + 1][COLS * 2 + 1]) {
 }
 
 
-
 int line_type(int r1, int c1, int r2, int c2){ // check if the line is horizontal or vertical
     if (r1 == r2)
         return HORIZONTAL; // horizontal
@@ -214,5 +213,28 @@ void init_board(GameState *state){
             }
         }
     }
+}
+
+GameState* deep_copy_GameState(const GameState* src) {
+    if (src == NULL) return NULL;
+
+    // Allocate memory for the new GameState
+    GameState* dest = (GameState*)malloc(sizeof(GameState));
+    if (dest == NULL) return NULL;
+
+    // Copy primitive types
+    dest->current_player = src->current_player;
+    dest->remaining_boxes = src->remaining_boxes;
+
+    // Copy arrays using memcpy (since they're contiguous memory blocks)
+    memcpy(dest->horizontal_lines, src->horizontal_lines, sizeof(src->horizontal_lines));
+    memcpy(dest->vertical_lines, src->vertical_lines, sizeof(src->vertical_lines));
+    memcpy(dest->box_owner, src->box_owner, sizeof(src->box_owner));
+    memcpy(dest->scores, src->scores, sizeof(src->scores));
+    
+    // Copy board (array of structs - safe to memcpy as Cell contains no pointers)
+    memcpy(dest->board, src->board, sizeof(src->board));
+
+    return dest;
 }
 
