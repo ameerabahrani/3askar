@@ -7,13 +7,17 @@
 #include <math.h>
 #include <string.h>
 #include <ctype.h>
+#include <limits.h>
 
 #define ROWS 4
 #define COLS 5
+#define MAX_DEPTH 5 // Max depth for minimax algorithm
 #define players 2
 #define RESET_COLOR "\033[0m"
 #define BLUE_COLOR "\033[1;34m"  // Player A
 #define RED_COLOR "\033[1;31m"  // Player B
+#define INF_MAX INT_MAX // Infinity
+#define INF_MIN INT_MIN // Negative Infinity
 #define GET_DEEP_COPY(dest, state_ptr)                        \
     do {                                                      \
         GameState* _copy_ptr = deep_copy_GameState(state_ptr);\
@@ -24,6 +28,8 @@
         (dest) = *_copy_ptr;                                  \
         free(_copy_ptr);                                      \
     } while (0)
+#define max(a, b) ((a) > (b) ? (a) : (b))
+#define min(a, b) ((a) < (b) ? (a) : (b))
 
 typedef struct {
     char symbol;
@@ -64,7 +70,7 @@ void handle_vertical_line(GameState *state, int r1, int c1, int r2);
 void init_board(GameState *state);
 int evaluationFunction(GameState *state);
 int simulate_move(GameState *state, int r1, int c1, int r2, int c2);
-Move minimax(GameState state, int depth, bool maximizingPlayer);
+Move minimax(GameState state, int depth, bool maximizingPlayer, int alpha, int beta);
 GameState* deep_copy_GameState(const GameState* src);
 
 #endif
