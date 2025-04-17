@@ -130,11 +130,17 @@ bool check_box(GameState *state, int r, int c){ // check if the box is completed
     return false;
 }
 
-//0 success
-//-1 not adjacent
-//-2 invalid line
-//-3 line already taken
-//-4 invalid coordinates
+/**
+ * REQUIRES: 0 <= r1 , r2 < ROWS && 0 <= c1 , c2 < COLS
+ *          Coordinates need to be adjacent either vertically or horizontally.
+ * EFFECTS: If valid it updates the board
+ * Returns:
+ *          0 - succes
+ *          1 - not adjacent
+ *          2 - invalid line
+ *          3 - line already taken
+ *          4 - invalid coordinates
+ */
 int process_move(GameState *state, int r1, int c1, int r2, int c2){ // process the move
     if (!adjacent(r1, c1, r2, c2))
         return -1; 
