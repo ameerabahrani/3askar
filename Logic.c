@@ -285,6 +285,19 @@ void init_board(GameState *state){
     }
 }
 
+
+/**
+ * GameState* deep_copy_GameState(const GameState* src)
+ *
+ * Requires:
+ *    The source GameState pointer (src) should not be NULL.
+ *
+ * Effects:
+ *    Allocates memory for a new GameState and copies the contents of the source GameState into it.
+ *
+ * Returns:
+ *    A pointer to the newly allocated and copied GameState, or NULL if memory allocation fails.
+ */
 GameState* deep_copy_GameState(const GameState* src) {
     if (src == NULL) return NULL;
 
