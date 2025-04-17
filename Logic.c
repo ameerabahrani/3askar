@@ -131,15 +131,23 @@ bool check_box(GameState *state, int r, int c){ // check if the box is completed
 }
 
 /**
- * REQUIRES: 0 <= r1 , r2 < ROWS && 0 <= c1 , c2 < COLS
- *          Coordinates need to be adjacent either vertically or horizontally.
- * EFFECTS: If valid it updates the board
+ * int process_move(GameState *state, int r1, int c1, int r2, int c2)
+ *
+ * Requires:
+ *    0 <= r1, r2 < ROWS and 0 <= c1, c2 < COLS
+ *    The 2 Coordinates needto be adjacent either vertically or horizontally.
+ *
+ * Effects;
+ *    Updates GameState by marking the chosen horizontal / vertical line as taken.
+ *    updates the board's representation with the symbol and player color.
+ *    Does not update score or switch players
+ *
  * Returns:
- *          0 - succes
- *          1 - not adjacent
- *          2 - invalid line
- *          3 - line already taken
- *          4 - invalid coordinates
+ *     0  move is valid
+ *    -1  dots are not adjacent
+ *    -2  line is invalid 
+ *    -3  line already taken
+ *    -4  coordinates are out of bounds
  */
 int process_move(GameState *state, int r1, int c1, int r2, int c2){ // process the move
     if (!adjacent(r1, c1, r2, c2))
