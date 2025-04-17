@@ -117,7 +117,21 @@ void print_board(Cell board[ROWS * 2 + 1][COLS * 2 + 1]) {
     }
 }
 
-
+/**
+ * int line_type(int r1, int c1, int r2, int c2)
+ *
+ * Requires:
+ *   All coordinates must be within the board bounds
+ *
+ * Effects:
+ *   Analyzes the  position of the two dots
+ *   Determines if the move is horizontal or vertical
+ *
+ * Returns:
+ *    HORIZONTAL  the move is a valid horizontal line
+ *    VERTICAL    if the move is a valid vertical line
+ *    -1           move is invalid 
+ */
 int line_type(int r1, int c1, int r2, int c2){ // check if the line is horizontal or vertical
     if (r1 == r2)
         return HORIZONTAL; // horizontal
