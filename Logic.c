@@ -201,6 +201,21 @@ void normalize_input(char *str) {
     for (char *p = str; *p; p++) *p = tolower(*p);
 }
 
+/**
+ * void init_board(GameState *state)
+ *
+ * Requires:
+ *    The gamestate pointer(state) should not be NULL.
+ *    Every field inside (state) is assumed to be allocated properly.
+ *
+ * Effects:
+ *    Initializes the visual board with dots in their positions
+ *    Clears any previous line symbols or box ownerships from the board
+ *    Prepares the board for a new game round
+ *
+ * Returns:
+ *   Nothing
+ */
 void init_board(GameState *state){
     int rows = ROWS * 2 + 1;
     int cols = COLS * 2 + 1;
