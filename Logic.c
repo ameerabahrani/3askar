@@ -73,6 +73,20 @@ void player_box(GameState *state, int r, int c){ // print the player's letter in
     }
 }
 
+/**
+ * void print_board(Cell board[ROWS * 2 + 1][COLS * 2 + 1])
+ *
+ * Requires:
+ *   The board must be fully initialized with Cell objects
+ *
+ * Effects
+ *    prints the current state of the game board to the console
+ *    Includes dots, horizontal/vertical lines and box ownership
+ *    applies color formatting.
+ *
+ * Returns
+ *    Nothing
+ */
 void print_board(Cell board[ROWS * 2 + 1][COLS * 2 + 1]) {
     int rows = ROWS * 2 + 1;
     int cols = COLS * 2 + 1;
