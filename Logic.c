@@ -199,7 +199,20 @@ int process_move(GameState *state, int r1, int c1, int r2, int c2){ // process t
     }
     return -2;
 }
-
+/**
+ * void normalize_input(char *str)
+ *
+ * Requires:
+ *   str must point to a null character array 
+ *
+ * Effects
+ *    Trims newline characters from the input.
+ *    Converts all uppercase letters to lowercase.
+ *    Option to  trim leading/trailing spaces.
+ *
+ * Returns:
+ *  Nothing
+ */
 void normalize_input(char *str) {
     // Trim leading whitespace
     char *start = str;
