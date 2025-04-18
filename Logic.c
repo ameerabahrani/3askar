@@ -110,7 +110,22 @@ void handle_vertical_line(GameState *state, int r1, int c1, int r2) {
         state->current_player = (state->current_player == 1) ? 2 : 1;
     }
 }
-
+/**
+ * void player_box(GameState *state, int r, int c)
+ 
+ * Requires
+ *   state must be initialized (should not be null)
+ *   (r, c) must refer to a valid box on the board
+ *
+ * Effects
+ *   Updates the box at given coordinates (r, c) with the current player's symbol
+ *       A for player 1
+ *       B for player 2
+ *   Sets the color of the box to match the current player
+ *
+ * Returns
+ *    Nothing
+ */
 void player_box(GameState *state, int r, int c){ // print the player's letter in the box
     if (state->current_player == 1){
         state->board[2 * r + 1][2 * c + 1].symbol = 'A';
