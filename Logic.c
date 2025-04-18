@@ -158,7 +158,7 @@ int process_move(GameState *state, int r1, int c1, int r2, int c2){ // process t
     if (line_type(r1, c1, r2, c2) == VERTICAL){ // vertical 
         int min_row = (r1 < r2) ? r1 : r2;
 
-        if (min_row < 0 || min_row > ROWS || c1 < 0 || c1 > COLS)
+        if (min_row < 0 || min_row >= ROWS || c1 < 0 || c1 > COLS)
         return -4; 
 
         if (state->vertical_lines[min_row][c1]) 
@@ -237,4 +237,3 @@ GameState* deep_copy_GameState(const GameState* src) {
 
     return dest;
 }
-

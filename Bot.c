@@ -64,7 +64,7 @@ void easy_bot_move(GameState *state){ // easy bot that plays a random move
             int linetype = line_type(r1, c1, r2, c2);
 
             if (linetype == 0){ // Horizontal line
-                handle_horizontal_line(state, r1, c1, r2);
+                handle_horizontal_line(state, r1, c1, c2);
             }
             if (linetype == 1){ 
                 handle_vertical_line(state, r1, c1, r2);
@@ -137,23 +137,24 @@ int evaluationFunction(GameState *state){
 void hard_bot_move(GameState *state) {
     Move best_move = {INF_MIN, -1, -1, -1, -1}; // Initialize best move with very low score and invalid coordinates
 
+    int max_moves = (ROWS  + 1) * COLS + ROWS * (COLS + 1); // Maximum number of moves possible
+    pthread_t threads[max_moves];
+    MinMax_thread_args *thread_args_arr[max_moves]; 
+    int thread_count = 0;
+
     // Horizontal moves loop
     for (int r = 0; r <= ROWS; r++) { 
         for (int c = 0; c <= COLS - 1; c++) {
             if (!state->horizontal_lines[r][c]) {
-                GameState temp_state;
-                GET_DEEP_COPY(temp_state, state);  // Macro handles allocation and free
-
-                if (simulate_move(&temp_state, r, c, r, c + 1) == 0) {
-                    Move curr_move = minimax(temp_state, MAX_DEPTH, (temp_state.current_player == 2), INF_MIN, INF_MAX); 
-                    if (curr_move.score > best_move.score) {
-                        best_move.score = curr_move.score;
-                        best_move.r1 = r;
-                        best_move.c1 = c;
-                        best_move.r2 = r;
-                        best_move.c2 = c + 1;
-                    }
-                }
+                MinMax_thread_args* args = malloc(sizeof(MinMax_thread_args)); // Allocate memory for thread arguments
+                args->state_copy = deep_copy_GameState(state); // Deep copy of the game state
+                args->r1 = r; args->c1 = c; args->r2 = r; args->c2 = c + 1;
+                args->depth = MAX_DEPTH; // Set the depth for minimax
+                args->alpha = INF_MIN; // Initialize alpha
+                args->beta = INF_MAX; // Initialize beta
+                thread_args_arr[thread_count] = args; // Store the arguments in the array
+                pthread_create(&threads[thread_count], NULL, minimax_thread, (void*)args); // Create the thread
+                thread_count++; // Increment the thread count
             }
         }
     }
@@ -162,24 +163,29 @@ void hard_bot_move(GameState *state) {
     for (int r = 0; r < ROWS; r++) {
         for (int c = 0; c <= COLS; c++) {
             if (!state->vertical_lines[r][c]) {
-                GameState temp_state;
-                GET_DEEP_COPY(temp_state, state);
-
-                if (simulate_move(&temp_state, r, c, r + 1, c) == 0) {
-                    Move curr_move = minimax(temp_state, MAX_DEPTH, (temp_state.current_player == 2), INF_MIN, INF_MAX); 
-                    if (curr_move.score > best_move.score) {
-                        best_move.score = curr_move.score;
-                        best_move.r1 = r;
-                        best_move.c1 = c;
-                        best_move.r2 = r + 1;
-                        best_move.c2 = c;
-                    }
-                }
+                MinMax_thread_args* args = malloc(sizeof(MinMax_thread_args)); // Allocate memory for thread arguments
+                args->state_copy = deep_copy_GameState(state); // Deep copy of the game state
+                args->r1 = r; args->c1 = c; args->r2 = r + 1; args->c2 = c;
+                args->depth = MAX_DEPTH; // Set the depth for minimax
+                args->alpha = INF_MIN; // Initialize alpha
+                args->beta = INF_MAX; // Initialize beta
+                thread_args_arr[thread_count] = args; // Store the arguments in the array
+                pthread_create(&threads[thread_count], NULL, minimax_thread, (void*)args); // Create the thread
+                thread_count++; // Increment the thread count
             }
         }
     }
 
-    if (best_move.score != -10000000) { // If a valid move was found
+    for (int i = 0; i < thread_count; i++){
+        pthread_join(threads[i], NULL);
+        MinMax_thread_args* args = thread_args_arr[i]; // Get the thread arguments
+        if (args->result.score > best_move.score) { // Check if the move is better than the current best move
+            best_move = args->result; // Update the best move
+        }
+        free(args);
+    }
+
+    if (best_move.score != INF_MIN) { // If a valid move was found
         int result = process_move(state, best_move.r1, best_move.c1, best_move.r2, best_move.c2);
         int lt = line_type(best_move.r1, best_move.c1, best_move.r2, best_move.c2);
         if (lt == HORIZONTAL) {
@@ -316,4 +322,19 @@ Move minimax(GameState state, int depth, bool maximizingPlayer, int alpha, int b
         prune_min:
             return best_move;
     }
+}
+
+void* minimax_thread(void* arguments){
+    MinMax_thread_args* arg = (MinMax_thread_args*)arguments; 
+
+    simulate_move(arg->state_copy, arg->r1, arg->c1, arg->r2, arg->c2); 
+
+    bool isMaximizing = (arg->state_copy->current_player == 2); 
+
+    arg->result = minimax(*arg->state_copy, arg->depth, isMaximizing, arg->alpha, arg->beta);
+
+    free(arg->state_copy); 
+
+    pthread_exit(NULL); 
+    return NULL; 
 }

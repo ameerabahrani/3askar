@@ -8,10 +8,11 @@
 #include <string.h>
 #include <ctype.h>
 #include <limits.h>
+#include <pthread.h>
 
 #define ROWS 4
 #define COLS 5
-#define MAX_DEPTH 5 // Max depth for minimax algorithm
+#define MAX_DEPTH 6 // Max depth for minimax algorithm
 #define players 2
 #define RESET_COLOR "\033[0m"
 #define BLUE_COLOR "\033[1;34m"  // Player A
@@ -51,6 +52,15 @@ typedef struct{
     int r1, r2, c1, c2;
 } Move;
 
+typedef struct {
+    GameState *state_copy;
+    int r1, c1, r2, c2;
+    int depth;
+    bool maximizingPlayer;
+    int alpha, beta;
+    Move result;
+} MinMax_thread_args;
+
 enum {HORIZONTAL, VERTICAL}; // for line type
 
 int line_type(int r1, int c1, int r2, int c2);
@@ -72,5 +82,6 @@ int evaluationFunction(GameState *state);
 int simulate_move(GameState *state, int r1, int c1, int r2, int c2);
 Move minimax(GameState state, int depth, bool maximizingPlayer, int alpha, int beta);
 GameState* deep_copy_GameState(const GameState* src);
+void* minimax_thread(void* arguments);
 
 #endif

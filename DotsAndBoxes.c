@@ -59,7 +59,7 @@ int main() {
                 switch (result) {
                     case 0:
                         if (linetype == HORIZONTAL){ // Horizontal line
-                            handle_horizontal_line(&game, r1, c1, r2);
+                            handle_horizontal_line(&game, r1, c1, c2);
                         }
                         if (linetype == VERTICAL){ // Vertical line
                             handle_vertical_line(&game, r1, c1, r2);
@@ -100,7 +100,7 @@ int main() {
                     switch (result) {
                         case 0:
                             if (linetype == HORIZONTAL){ // Horizontal line
-                                handle_horizontal_line(&game, r1, c1, r2);
+                                handle_horizontal_line(&game, r1, c1, c2);
                             }
                             if (linetype == VERTICAL){  // Vertical line
                                 handle_vertical_line(&game, r1, c1, r2);
