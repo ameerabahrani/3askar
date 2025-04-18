@@ -1,5 +1,25 @@
 #include "game.h"
 
+/**
+ * void claim_box(GameState *state, int r, int c, bool *boxCompleted)
+ *
+ * Requires
+ *   (r, c) must be a valid box coordinate 
+ *    (state] needs to be initialized and cant be NULL
+ *    (boxCompleted) must point to a valid boolean
+
+ * Effects
+ *    Checks whether all four lines around box have been drawn
+ *    1)If box is completed ( closed from 4 sides):
+ *    Assigns the box to the current player
+ *    change the visual board and update the player score
+ *    Sets the pointer *boxCompleted = true
+ *    2)If box is not completed:
+ *    Does not update the visual board and does not update player score
+ *    sets the pointer *boxCompleted = false
+ * Returns
+ *   Nothing
+ */
 void claim_box(GameState *state, int r, int c, bool *boxCompleted){
     state->box_owner[r][c] = state->current_player;
     state->scores[state->current_player - 1]++;
