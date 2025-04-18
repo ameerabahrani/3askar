@@ -1,5 +1,25 @@
 #include "game.h"
 
+/**
+ * void claim_box(GameState *state, int r, int c, bool *boxCompleted)
+ *
+ * Requires
+ *   (r, c) must be a valid box coordinate 
+ *    (state] needs to be initialized and cant be NULL
+ *    (boxCompleted) must point to a valid boolean
+
+ * Effects
+ *    Checks whether all four lines around box have been drawn
+ *    1)If box is completed ( closed from 4 sides):
+ *    Assigns the box to the current player
+ *    change the visual board and update the player score
+ *    Sets the pointer *boxCompleted = true
+ *    2)If box is not completed:
+ *    Does not update the visual board and does not update player score
+ *    sets the pointer *boxCompleted = false
+ * Returns
+ *   Nothing
+ */
 void claim_box(GameState *state, int r, int c, bool *boxCompleted){
     state->box_owner[r][c] = state->current_player;
     state->scores[state->current_player - 1]++;
@@ -21,7 +41,22 @@ void claim_box(GameState *state, int r, int c, bool *boxCompleted){
     if (col + 1 < COLS * 2 + 1)
         state->board[row][col + 1].color = color; // Right
 }
-
+/**
+ * void handle_horizontal_line(GameState *state, int r1, int c1, int c2)
+ *
+ * Requires:
+ *    The coordinates (r1, c1) and (r1, c2) must be a valid horizontal line
+ *     The move must already be validated and not already drawn
+ *
+ * Effects:
+ *    draws a horizontal line between the chosen dots on the board
+ *    Checks if one or two boxes were completed by this move
+ *    Assigns completed boxes to the current player and adds it to their score
+ *    Switches to the other player if no box was taken
+ *
+ * Returns:
+ *   Nothing
+ */
 void handle_horizontal_line(GameState *state, int r1, int c1, int c2) {
     bool boxCompleted = false;
     int min_col = (c1 < c2) ? c1 : c2;
@@ -41,7 +76,21 @@ void handle_horizontal_line(GameState *state, int r1, int c1, int c2) {
         state->current_player = (state->current_player == 1) ? 2 : 1;
     }
 }
-
+/**
+ * void handle_vertical_line(GameState *state, int r1, int c1, int r2)
+ * 
+ * Requires:
+ *    The coordinates (r1, c1) and (r2, c1) must form a valid vertical line
+ *    The move must already be validated and not already drawn
+ * 
+ * Effects
+ *    Draws a vertical line between the chosen dots on the board
+ *    Checks if one or at maximum two boxes were completed by this move
+ *    Assigns completed boxes to the current player and changes their score
+ *    Switches to the other player if no box was completed
+ * Returns
+ *  Nothing.
+ */
 void handle_vertical_line(GameState *state, int r1, int c1, int r2) {
     bool boxCompleted = false;
     int min_row = (r1 < r2) ? r1 : r2;
@@ -61,7 +110,22 @@ void handle_vertical_line(GameState *state, int r1, int c1, int r2) {
         state->current_player = (state->current_player == 1) ? 2 : 1;
     }
 }
-
+/**
+ * void player_box(GameState *state, int r, int c)
+ 
+ * Requires
+ *   state must be initialized (should not be null)
+ *   (r, c) must refer to a valid box on the board
+ *
+ * Effects
+ *   Updates the box at given coordinates (r, c) with the current player's symbol
+ *       A for player 1
+ *       B for player 2
+ *   Sets the color of the box to match the current player
+ *
+ * Returns
+ *    Nothing
+ */
 void player_box(GameState *state, int r, int c){ // print the player's letter in the box
     if (state->current_player == 1){
         state->board[2 * r + 1][2 * c + 1].symbol = 'A';
@@ -73,6 +137,20 @@ void player_box(GameState *state, int r, int c){ // print the player's letter in
     }
 }
 
+/**
+ * void print_board(Cell board[ROWS * 2 + 1][COLS * 2 + 1])
+ *
+ * Requires:
+ *   The board must be fully initialized with Cell objects
+ *
+ * Effects
+ *    prints the current state of the game board to the console
+ *    Includes dots, horizontal/vertical lines and box ownership
+ *    applies color formatting.
+ *
+ * Returns
+ *    Nothing
+ */
 void print_board(Cell board[ROWS * 2 + 1][COLS * 2 + 1]) {
     int rows = ROWS * 2 + 1;
     int cols = COLS * 2 + 1;
@@ -103,7 +181,21 @@ void print_board(Cell board[ROWS * 2 + 1][COLS * 2 + 1]) {
     }
 }
 
-
+/**
+ * int line_type(int r1, int c1, int r2, int c2)
+ *
+ * Requires:
+ *   All coordinates must be within the board bounds
+ *
+ * Effects:
+ *   Analyzes the  position of the two dots
+ *   Determines if the move is horizontal or vertical
+ *
+ * Returns:
+ *    HORIZONTAL  the move is a valid horizontal line
+ *    VERTICAL    if the move is a valid vertical line
+ *    -1           move is invalid 
+ */
 int line_type(int r1, int c1, int r2, int c2){ // check if the line is horizontal or vertical
     if (r1 == r2)
         return HORIZONTAL; // horizontal
@@ -130,11 +222,25 @@ bool check_box(GameState *state, int r, int c){ // check if the box is completed
     return false;
 }
 
-//0 success
-//-1 not adjacent
-//-2 invalid line
-//-3 line already taken
-//-4 invalid coordinates
+/**
+ * int process_move(GameState *state, int r1, int c1, int r2, int c2)
+ *
+ * Requires:
+ *    0 <= r1, r2 < ROWS and 0 <= c1, c2 < COLS
+ *    The 2 Coordinates needto be adjacent either vertically or horizontally.
+ *
+ * Effects;
+ *    Updates GameState by marking the chosen horizontal / vertical line as taken.
+ *    updates the board's representation with the symbol and player color.
+ *    Does not update score or switch players
+ *
+ * Returns:
+ *     0  move is valid
+ *    -1  dots are not adjacent
+ *    -2  line is invalid 
+ *    -3  line already taken
+ *    -4  coordinates are out of bounds
+ */
 int process_move(GameState *state, int r1, int c1, int r2, int c2){ // process the move
     if (!adjacent(r1, c1, r2, c2))
         return -1; 
@@ -171,7 +277,20 @@ int process_move(GameState *state, int r1, int c1, int r2, int c2){ // process t
     }
     return -2;
 }
-
+/**
+ * void normalize_input(char *str)
+ *
+ * Requires:
+ *   str must point to a null character array 
+ *
+ * Effects
+ *    Trims newline characters from the input.
+ *    Converts all uppercase letters to lowercase.
+ *    Option to  trim leading/trailing spaces.
+ *
+ * Returns:
+ *  Nothing
+ */
 void normalize_input(char *str) {
     // Trim leading whitespace
     char *start = str;
@@ -187,6 +306,21 @@ void normalize_input(char *str) {
     for (char *p = str; *p; p++) *p = tolower(*p);
 }
 
+/**
+ * void init_board(GameState *state)
+ *
+ * Requires:
+ *    The gamestate pointer(state) should not be NULL.
+ *    Every field inside (state) is assumed to be allocated properly.
+ *
+ * Effects:
+ *    Initializes the visual board with dots in their positions
+ *    Clears any previous line symbols or box ownerships from the board
+ *    Prepares the board for a new game round
+ *
+ * Returns:
+ *   Nothing
+ */
 void init_board(GameState *state){
     int rows = ROWS * 2 + 1;
     int cols = COLS * 2 + 1;
@@ -215,6 +349,19 @@ void init_board(GameState *state){
     }
 }
 
+
+/**
+ * GameState* deep_copy_GameState(const GameState* src)
+ *
+ * Requires:
+ *    The source GameState pointer (src) should not be NULL.
+ *
+ * Effects:
+ *    Allocates memory for a new GameState and copies the contents of the source GameState into it.
+ *
+ * Returns:
+ *    A pointer to the newly allocated and copied GameState, or NULL if memory allocation fails.
+ */
 GameState* deep_copy_GameState(const GameState* src) {
     if (src == NULL) return NULL;
 

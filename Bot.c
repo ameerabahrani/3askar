@@ -33,6 +33,23 @@ int simulate(GameState state, int r1, int c1, int r2, int c2) { // simulate the 
     return boxes_completed;
 }
 
+/**
+ * void easy_bot_move(GameState *state)
+ * 
+ * Requires: 
+ *      The GameState pointer (state) should not be NULL.
+ *      The random number generator should be seeded before calling this function(in the main method).
+ * 
+ * Effects:
+ *      The function will play a random move for the bot. 
+ *      It will keep generating random moves until it finds a valid one.
+ *      The function will update the GameState with the new move.
+ *      The function will print the move played by the bot.
+ * 
+ * Returns:
+ *      Nothing
+ * 
+ */
 void easy_bot_move(GameState *state){ // easy bot that plays a random move
    
     int r1, c1, r2, c2;
@@ -78,6 +95,23 @@ void easy_bot_move(GameState *state){ // easy bot that plays a random move
         }
     }
 }
+
+
+/**
+ * void medium_bot_move(GameState *state)
+ * 
+ * Requires: 
+ *      The GameState pointer (state) should not be NULL.
+ * 
+ * Effects:
+ *      The function will play a move for the bot that will complete the most boxes.
+ *      If no boxes can be completed, it will play a random move.
+ *      The function will update the GameState with the new move.
+ *      The function will print the move played by the bot.
+ * 
+ * Returns:
+ *      Nothing
+ */
 
 void medium_bot_move(GameState *state) { // medium bot that plays a move that will complete the most boxes or random move if no boxes can be completed
     int most_boxes = 0;
@@ -131,6 +165,18 @@ void medium_bot_move(GameState *state) { // medium bot that plays a move that wi
     }
 }
 
+/**
+ * int evaluationFunction(GameState *state)
+ * 
+ * Requires: 
+ *      The GameState pointer (state) should not be NULL.
+ * 
+ * Effects:
+ *      The function will evaluate the current state of the game.
+ *
+ * Returns:
+ *      The difference between the scores of player 2 and player 1.
+ */
 int evaluationFunction(GameState *state){
     return state->scores[1] - state->scores[0];
 }
@@ -198,6 +244,23 @@ void hard_bot_move(GameState *state) {
     } 
 }
 
+/**
+ * int simulate_move(GameState *state, int r1, int c1, int r2, int c2)
+ * 
+ * Requires: 
+ *      The GameState pointer (state) should not be NULL.
+ * 
+ * Effects:
+ *      The function will simulate a move on the game state.
+ *      It will update the game state with the new move.
+ * 
+ * Returns:
+ *      0 if the move is valid and completed boxes
+ *      -1 if the dots are not adjacent
+ *      -2 if the line is invalid
+ *      -3 if the line is already taken
+ *      -4 if the coordinates are out of bounds
+ */
 int simulate_move(GameState *state, int r1, int c1, int r2, int c2) {
     int result = process_move(state, r1, c1, r2, c2);
     if (result != 0) 
