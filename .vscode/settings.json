@@ -61,6 +61,7 @@
     "stdbool.h": "c",
     "time.h": "c",
     "game.h": "c",
-    "random": "c"
+    "random": "c",
+    "stdio.h": "c"
   }
 }
