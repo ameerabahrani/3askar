@@ -21,7 +21,22 @@ void claim_box(GameState *state, int r, int c, bool *boxCompleted){
     if (col + 1 < COLS * 2 + 1)
         state->board[row][col + 1].color = color; // Right
 }
-
+/**
+ * void handle_horizontal_line(GameState *state, int r1, int c1, int c2)
+ *
+ * Requires:
+ *    The coordinates (r1, c1) and (r1, c2) must be a valid horizontal line
+ *     The move must already be validated and not already drawn
+ *
+ * Effects:
+ *    draws a horizontal line between the chosen dots on the board
+ *    Checks if one or two boxes were completed by this move
+ *    Assigns completed boxes to the current player and adds it to their score
+ *    Switches to the other player if no box was taken
+ *
+ * Returns:
+ *   Nothing
+ */
 void handle_horizontal_line(GameState *state, int r1, int c1, int c2) {
     bool boxCompleted = false;
     int min_col = (c1 < c2) ? c1 : c2;
@@ -41,7 +56,21 @@ void handle_horizontal_line(GameState *state, int r1, int c1, int c2) {
         state->current_player = (state->current_player == 1) ? 2 : 1;
     }
 }
-
+/**
+ * void handle_vertical_line(GameState *state, int r1, int c1, int r2)
+ * 
+ * Requires:
+ *    The coordinates (r1, c1) and (r2, c1) must form a valid vertical line
+ *    The move must already be validated and not already drawn
+ * 
+ * Effects
+ *    Draws a vertical line between the chosen dots on the board
+ *    Checks if one or at maximum two boxes were completed by this move
+ *    Assigns completed boxes to the current player and changes their score
+ *    Switches to the other player if no box was completed
+ * Returns
+ *  Nothing.
+ */
 void handle_vertical_line(GameState *state, int r1, int c1, int r2) {
     bool boxCompleted = false;
     int min_row = (r1 < r2) ? r1 : r2;
