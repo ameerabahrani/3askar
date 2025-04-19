@@ -218,6 +218,19 @@ int get_line_type(int r1, int c1, int r2, int c2) {
   return -1; // invalid
 }
 
+/**
+ * bool adjacent(int r1, int c1, int r2, int c2)
+ *
+ * Requires:
+ *   All coordinates must be within the board bounds
+ *
+ * Effects:
+ *   Checks if the two coordinates are adjacent either vertically or horizontally
+ *
+ * Returns:
+ *    true  if the coordinates are adjacent
+ *    false if they are not adjacent
+ */
 bool adjacent(int r1, int c1, int r2, int c2) { // check if the lines are adjacent
   if (r1 == r2 && abs(c1 - c2) == 1) {
     return true;
@@ -229,6 +242,20 @@ bool adjacent(int r1, int c1, int r2, int c2) { // check if the lines are adjace
   return false;
 }
 
+/**
+ * bool check_box(GameState *state, int r, int c)
+ *
+ * Requires:
+ *   The coordinates (r, c) must be a valid box coordinate
+ *   The GameState pointer (state) should not be NULL.
+ *
+ * Effects:
+ *   Checks if the box at (r, c) is completed by checking the lines around it
+ *
+ * Returns:
+ *    true  if the box is completed
+ *    false if the box is not completed
+ */
 bool check_box(GameState *state, int r, int c) { // check if the box is completed
   if (r < 0 || r >= ROWS || c < 0 || c >= COLS) {
     return false;
