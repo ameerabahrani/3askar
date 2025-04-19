@@ -74,9 +74,9 @@ void easy_bot_move(GameState *state) { // easy bot that plays a random move
  *
  * Effects:
  *      The function will play a move for the bot that will complete the most
- * boxes. If no boxes can be completed, it will play a random move. The function
- * will update the GameState with the new move. The function will print the move
- * played by the bot.
+ *      boxes. If no boxes can be completed, it will play a random move. The function
+ *      will update the GameState with the new move. The function will print the move
+ *      played by the bot.
  *
  * Returns:
  *      Nothing
@@ -151,6 +151,21 @@ void medium_bot_move(GameState *state) { // medium bot that plays a move that wi
   }
 }
 
+/**
+ * void* medium_bot_thread(void* args)
+ *
+ * Requires:
+ *      The GameState pointer (state) should not be NULL.
+ *
+ * Effects:
+ *      The function will play a move for the bot that will complete the most
+ *      boxes. If no boxes can be completed, it will play a random move. The function
+ *      will update the GameState with the new move. The function will print the move
+ *      played by the bot.
+ *
+ * Returns:
+ *      Nothing
+ */
 void* medium_bot_thread(void* args){
   MediumBotThreadArgs* arg = (MediumBotThreadArgs*) args;
   int local_most_boxes = 0;
@@ -204,6 +219,20 @@ void* medium_bot_thread(void* args){
   return NULL; 
 }
 
+/**
+ * int simulate_box_completion_count(GameState state, int r1, int c1, int r2,
+ * int c2)
+ *
+ * Requires:
+ *      The GameState pointer (state) should not be NULL.
+ *
+ * Effects:
+ *      The function will simulate a move on the game state.
+ *      It will check how many boxes are completed by this move.
+ *
+ * Returns:
+ *      The number of boxes completed by the move.
+ */
 int simulate_box_completion_count(GameState state, int r1, int c1, int r2,
              int c2) { // simulate the move on a pass by value gamestate and
                        // only return the number of boxes completed
@@ -349,6 +378,20 @@ int evaluation_function(GameState *state) {
   return state->scores[1] - state->scores[0];
 }
 
+/**
+ * Move minimax(GameState state, int depth, bool maximizingPlayer, int alpha,
+ * int beta)
+ *
+ * Requires:
+ *      The GameState pointer (state) should not be NULL.
+ *
+ * Effects:
+ *      The function will evaluate the current state of the game using the
+ *      minimax algorithm with alpha-beta pruning.
+ *
+ * Returns:
+ *      The best move for the current player.
+ */
 Move minimax(GameState state, int depth, bool maximizingPlayer, int alpha, int beta) {
   Move best_move;
   if (depth == 0 || state.remaining_boxes == 0) {
