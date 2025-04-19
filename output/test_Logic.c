@@ -1,13 +1,23 @@
 #include <assert.h>
 #include <stdbool.h>
-#include "game.h"
-#include "Logic.c"    
+#include "C:\Users\user\3askar\Logic.c"    
 
 static void test_line_type(void) {
     assert(get_line_type(0,0, 0,1) == HORIZONTAL);
     assert(get_line_type(0,0, 1,0) == VERTICAL);
     assert(get_line_type(0,0, 1,1) == -1);
 }
+
+static void test_adjacent(void) {
+    assert(adjacent(0,0, 0,1) == true); //valid horizontal adjacency
+    assert(adjacent(0,0, 1,0) == true); // valid vertical adjacency
+    assert(!adjacent(0,0, 1,1) == false); // diagonal non-adjacent
+    assert(adjacent(ROWS - 1, COLS - 1, ROWS - 2, COLS - 1) == true); // vild vertical adjacency at the edge of the board
+    assert(adjacent(0, 0, 0, 0) == false); // point cannot be adjacent to itself
+    assert(adjacent(0, 0, 0, 2) == false); // not adjacent
+    assert(adjacent(0, 0, 2, 0) == false); // not adjacent
+}
+
 
 static void test_check_box(void) {
     GameState s = {0};
@@ -87,14 +97,34 @@ static void test_print_box(void) {
     assert(s.board[1][1].color  == 1);
 }
 
+void test_normalize_input() {
+    char s1[] = "  HELLO ";  // leading/trailing spaces
+    normalize_input(s1);
+    assert(strcmp(s1, "hello") == 0);
+
+    char s2[] = "NO\n";      // trailing newline
+    normalize_input(s2);
+    assert(strcmp(s2, "no") == 0);
+
+    char s3[] = "";         
+    normalize_input(s3);
+    assert(strcmp(s3, "") == 0);
+
+    char s4[] = "  A  B  ";  //internal spaces are preserved 
+    normalize_input(s4);
+    assert(strcmp(s4, "a  b") == 0);
+}
+
 int main(void) {
     test_line_type();
+    test_adjacent();
     test_check_box();
     test_process_move();
     test_claim_box();
     test_handle_horizontal_line();
     test_handle_vertical_line();
     test_print_box();
+    test_normalize_input();
     printf("all tests passed\n");
     return 0;
 }
