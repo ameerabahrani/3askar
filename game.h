@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/time.h>
 
 enum { HORIZONTAL, VERTICAL }; // for line type
 
@@ -59,13 +60,16 @@ typedef struct {
 } Move;
 
 typedef struct {
-  GameState *state_copy;
-  int r1, c1, r2, c2;
-  int depth;
-  bool maximizingPlayer;
-  int alpha, beta;
-  Move result;
-} MinMax_thread_args;
+  GameState state;
+  int *best_boxes;
+  int *best_r1;
+  int *best_c1;
+  int *best_r2;
+  int *best_c2;
+  bool *found_move;
+  pthread_mutex_t *lock;
+  bool is_horizontal;
+} MediumBotThreadArgs;
 
 // ------------------------ Logic.c ------------------------
 int get_line_type(int r1, int c1, int r2, int c2);
@@ -88,9 +92,8 @@ int simulate_box_completion_count(GameState state, int r1, int c1, int r2, int c
 void init_board(GameState *state);
 int evaluation_function(GameState *state);
 int simulate_apply_move(GameState *state, int r1, int c1, int r2, int c2);
-Move minimax(GameState state, int depth, bool maximizingPlayer, int alpha,
-             int beta);
+Move minimax(GameState state, int depth, bool maximizingPlayer, int alpha, int beta);
 GameState *deep_copy_GameState(const GameState *src);
-void *minimax_thread(void *arguments);
+void* medium_bot_thread(void* args);
 
 #endif
