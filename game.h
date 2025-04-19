@@ -22,7 +22,7 @@ enum { HORIZONTAL, VERTICAL }; // for line type
 #define RED_COLOR "\033[1;31m"  // Player B
 #define INF_MAX INT_MAX         // Infinity
 #define INF_MIN INT_MIN         // Negative Infinity
-#define GET_DEEP_COPY(dest, state_ptr)                                        \
+#define GET_DEEP_COPY(dest, state_ptr)                                         \
   do {                                                                         \
     GameState *_copy_ptr = deep_copy_GameState(state_ptr);                     \
     if (_copy_ptr == NULL) {                                                   \
