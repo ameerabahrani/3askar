@@ -26,11 +26,9 @@ void easy_bot_move(GameState *state) { // easy bot that plays a random move
 
   while (1) {
 
-    int isHorizontal = rand() % 2; // 0 or 1 to choose if the bot will generate
-                                   // a horizontal or vertical line
+    int isHorizontal = rand() % 2; // randomly choose between horizontal and vertical
 
-    if (isHorizontal == 1) {
-      // Horizontal line
+    if (isHorizontal == 1) { 
       r1 = rand() % (ROWS + 1);
       c1 = rand() % COLS;
 
@@ -41,7 +39,7 @@ void easy_bot_move(GameState *state) { // easy bot that plays a random move
       r1 = rand() % ROWS;
       c1 = rand() % (COLS + 1);
 
-      r2 = r1 + 1;
+      r2 = r1 + 1; 
       c2 = c1;
     }
 
@@ -73,31 +71,30 @@ void easy_bot_move(GameState *state) { // easy bot that plays a random move
  *      The GameState pointer (state) should not be NULL.
  *
  * Effects:
- *      The function will play a move for the bot that will complete the most
- *      boxes. If no boxes can be completed, it will play a random move. The function
- *      will update the GameState with the new move. The function will print the move
- *      played by the bot.
+ *      Medium difficulty bot that plays the move completing the most boxes, or random moves if none can be completed. 
+ *      Uses parallel threads to evaluate horizontal and vertical moves simultaenously.
+ *      The function updates the GameState with the new move and prints the move played by the bot.
  *
  * Returns:
  *      Nothing
  */
-void medium_bot_move(GameState *state) { // medium bot that plays a move that will complete the most
-                                         // boxes or random move if no boxes can be completed
+void medium_bot_move(GameState *state) { 
   struct timeval start, end;
   gettimeofday(&start, NULL);
 
-  int most_boxes = 0;
-  int r1, c1, r2, c2;
-
-  bool move_with_box = false;
+  //Shared variables between threads (mutex protected)
+  int most_boxes = 0;          // Number of boxes completed by the best move
+  int r1, c1, r2, c2;         // Coordinates of best move
+  bool move_with_box = false; // Indicates if a move with box completion was found
 
   pthread_mutex_t lock;
-  pthread_mutex_init(&lock, NULL); // Initialize the mutex lock
+  pthread_mutex_init(&lock, NULL); // Protects the result for the shared move evaluation
 
+  // Initialize two threads, one for horizontal moves and one for vertical moves
   pthread_t threads[2];
   MediumBotThreadArgs args[2];
 
-  args[0] = (MediumBotThreadArgs) {
+  args[0] = (MediumBotThreadArgs) { // Thread for horizontal move evaluation
       .state = *state,
       .best_boxes = &most_boxes,
       .best_r1 = &r1,
@@ -107,9 +104,9 @@ void medium_bot_move(GameState *state) { // medium bot that plays a move that wi
       .found_move = &move_with_box,
       .lock = &lock,
       .is_horizontal = true
-    }; // Horizontal move
+    };
 
-  args[1] = (MediumBotThreadArgs) {
+  args[1] = (MediumBotThreadArgs) { // Thread for Vertical move evaluation 
       .state = *state,
       .best_boxes = &most_boxes,
       .best_r1 = &r1,
@@ -119,14 +116,15 @@ void medium_bot_move(GameState *state) { // medium bot that plays a move that wi
       .found_move = &move_with_box,
       .lock = &lock,
       .is_horizontal = false
-    }; // Vertical move
+    };
 
-  pthread_create(&threads[0], NULL, medium_bot_thread, (void *)&args[0]);
+  //Create parallel evaluation threads
+  pthread_create(&threads[0], NULL, medium_bot_thread, (void *)&args[0]); 
   pthread_create(&threads[1], NULL, medium_bot_thread, (void *)&args[1]);
-
+  
+  //Wait for both evaluations to complete
   pthread_join(threads[0], NULL);
   pthread_join(threads[1], NULL);
-
   pthread_mutex_destroy(&lock);
 
   gettimeofday(&end, NULL); // End time measurement
@@ -136,17 +134,19 @@ void medium_bot_move(GameState *state) { // medium bot that plays a move that wi
   printf("Bot decision time: %.3f seconds\n", elapsed);
 
   if (move_with_box) {
+    // If a move with box completion was found, play that move
     int result = process_move(state, r1, c1, r2, c2);
     int linetype = get_line_type(r1, c1, r2, c2);
 
-    if (linetype == HORIZONTAL) { // Horizontal line
+    if (linetype == HORIZONTAL) {   
       handle_horizontal_line(state, r1, c1, c2);
     }
-    if (linetype == VERTICAL) { // Vertical line
+    if (linetype == VERTICAL) { 
       handle_vertical_line(state, r1, c1, r2);
     }
     printf("Bot played: %d %d %d %d\n", r1, c1, r2, c2);
-  } else { // Fallback to random move if no boxes can be completed
+  } else { 
+    // Fallback to random move if no boxes can be completed
     easy_bot_move(state);
   }
 }
@@ -158,21 +158,21 @@ void medium_bot_move(GameState *state) { // medium bot that plays a move that wi
  *      The GameState pointer (state) should not be NULL.
  *
  * Effects:
- *      The function will play a move for the bot that will complete the most
- *      boxes. If no boxes can be completed, it will play a random move. The function
- *      will update the GameState with the new move. The function will print the move
- *      played by the bot.
+ *      Thread function evaluation moves (horizontal/vertical)
+ *      Explores all possible moves for the bot and finds the one that completes the most boxes.
  *
  * Returns:
- *      Nothing
+ *      NULL
  */
 void* medium_bot_thread(void* args){
   MediumBotThreadArgs* arg = (MediumBotThreadArgs*) args;
+  //local tracking of best move 
   int local_most_boxes = 0;
   int local_r1, local_c1, local_r2, local_c2;
   bool local_move_with_box = false;
 
   if (arg->is_horizontal){
+    // Evaluate all possible horizontal moves for thread 0
     for (int r = 0; r <= ROWS; r++) {
       for (int c = 0; c <= COLS - 1; c++) {
         if (arg->state.horizontal_lines[r][c] == false) {
@@ -189,6 +189,7 @@ void* medium_bot_thread(void* args){
       }
     }
   } else {
+    // Evaluate all possible vertical moves for thread 1 
     for (int r = 0; r <= ROWS - 1; r++) {
       for (int c = 0; c <= COLS; c++) {
         if (arg->state.vertical_lines[r][c] == false) {
@@ -206,6 +207,7 @@ void* medium_bot_thread(void* args){
     }
   }
 
+  // Atomically update the shared variables if a better move is found
   pthread_mutex_lock(arg->lock); // Lock the mutex to update shared variables
   if (local_most_boxes > *arg->best_boxes) {
     *arg->best_boxes = local_most_boxes;
@@ -213,9 +215,9 @@ void* medium_bot_thread(void* args){
     *arg->best_c1 = local_c1;
     *arg->best_r2 = local_r2;
     *arg->best_c2 = local_c2;
-    *arg->found_move = local_move_with_box; // Update the found move status
+    *arg->found_move = local_move_with_box; // Update local move with box status 
   }
-  pthread_mutex_unlock(arg->lock); // Unlock the mutex
+  pthread_mutex_unlock(arg->lock); 
   return NULL; 
 }
 
@@ -228,26 +230,26 @@ void* medium_bot_thread(void* args){
  *
  * Effects:
  *      The function will simulate a move on the game state.
- *      It will check how many boxes are completed by this move.
+ *      It will will check how many boxes are completed by this move.
  *
  * Returns:
- *      The number of boxes completed by the move.
+ *      The number of boxes completed by the move (0 if invalid).
  */
-int simulate_box_completion_count(GameState state, int r1, int c1, int r2,
-             int c2) { // simulate the move on a pass by value gamestate and
-                       // only return the number of boxes completed
-  int result = process_move(&state, r1, c1, r2, c2);
 
+
+int simulate_box_completion_count(GameState state, int r1, int c1, int r2, int c2) { 
+  // Try move on a temporary state
+  int result = process_move(&state, r1, c1, r2, c2);
   if (result != 0){
-    return 0;
+    return 0; // If invalid move, return 0 boxes completed
   }
 
   int boxes_completed = 0;
   int linetype = get_line_type(r1, c1, r2, c2);
 
   if (linetype == HORIZONTAL) {
+    // Check bith boxes above and below the horizontal line
     int min_col = (c1 < c2) ? c1 : c2;
-
     if (r1 > 0 && state.box_owner[r1 - 1][min_col] == 0 &&
         check_box(&state, r1 - 1, min_col)) {
       boxes_completed++;
@@ -256,9 +258,9 @@ int simulate_box_completion_count(GameState state, int r1, int c1, int r2,
         check_box(&state, r1, min_col)) {
       boxes_completed++;
     }
-  } else if (linetype == VERTICAL) { // Vertical Line
+  } else if (linetype == VERTICAL) { 
+    // Check boxes left and right of the vertical line
     int min_row = (r1 < r2) ? r1 : r2;
-
     if (c1 > 0 && state.box_owner[min_row][c1 - 1] == 0 &&
         check_box(&state, min_row, c1 - 1)) {
       boxes_completed++;
@@ -272,15 +274,29 @@ int simulate_box_completion_count(GameState state, int r1, int c1, int r2,
   return boxes_completed;
 }
 
-void hard_bot_move(GameState *state) {
-  Move best_move = {INF_MIN, -1, -1, -1, -1}; // Initialize best move with very low score and invalid coordinates
+/**
+ * void hard_bot_move(GameState *state)
+ *
+ * Requires:
+ *      The GameState pointer (state) should not be NULL.
+ *
+ * Effects:
+ *      The function will play the best move for the bot using the minimax algorithm with alpha-beta pruning.
+ *      Evaluates all possible moves to depth MAX_DEPTH and chooses the most optimal one.
+ *
+ * Returns:
+ *      Nothing
+ */
 
-  // Horizontal moves loop
+void hard_bot_move(GameState *state) {
+  Move best_move = {INF_MIN, -1, -1, -1, -1}; // Initialize with worst possible score
+
+  // Evaluate all horizontal moves
   for (int r = 0; r <= ROWS; r++) { 
       for (int c = 0; c <= COLS - 1; c++) {
           if (!state->horizontal_lines[r][c]) {
               GameState temp_state;
-              GET_DEEP_COPY(temp_state, state);  // Macro handles allocation and free
+              GET_DEEP_COPY(temp_state, state);  // Isolated simulation
 
               if (simulate_apply_move(&temp_state, r, c, r, c + 1) == 0) {
                   Move curr_move = minimax(temp_state, MAX_DEPTH, (temp_state.current_player == 2), INF_MIN, INF_MAX); 
@@ -296,7 +312,7 @@ void hard_bot_move(GameState *state) {
       }
   }
 
-  // Vertical moves loop (note: r goes from 0 to ROWS-1)
+  // Evaluate all vertical moves (note: r goes from 0 to ROWS-1)
   for (int r = 0; r < ROWS; r++) {
       for (int c = 0; c <= COLS; c++) {
           if (!state->vertical_lines[r][c]) {
@@ -317,7 +333,8 @@ void hard_bot_move(GameState *state) {
       }
   }
 
-  if (best_move.score != -10000000) { // If a valid move was found
+  // Execute the best move found (if valid)
+  if (best_move.score != -10000000) { 
       int result = process_move(state, best_move.r1, best_move.c1, best_move.r2, best_move.c2);
       int lt = get_line_type(best_move.r1, best_move.c1, best_move.r2, best_move.c2);
       if (lt == HORIZONTAL) {
@@ -350,8 +367,9 @@ void hard_bot_move(GameState *state) {
 int simulate_apply_move(GameState *state, int r1, int c1, int r2, int c2) {
   int result = process_move(state, r1, c1, r2, c2);
   if (result != 0)
-    return result;
+    return result; // Invalid move, return error code
 
+  // Handle box completion for valid move
   int linetype = get_line_type(r1, c1, r2, c2);
   if (linetype == HORIZONTAL) { 
     handle_horizontal_line(state, r1, c1, c2);
@@ -394,6 +412,8 @@ int evaluation_function(GameState *state) {
  */
 Move minimax(GameState state, int depth, bool maximizingPlayer, int alpha, int beta) {
   Move best_move;
+
+  // Base case: if depth is 0 or no remaining boxes, return evaluation score
   if (depth == 0 || state.remaining_boxes == 0) {
       best_move.score = evaluation_function(&state);
       best_move.r1 = best_move.c1 = best_move.r2 = best_move.c2 = -1;
@@ -402,7 +422,7 @@ Move minimax(GameState state, int depth, bool maximizingPlayer, int alpha, int b
 
   if (maximizingPlayer) {
       best_move.score = INF_MIN; // -INF_MAX
-      // Horizontal moves
+      // Horizontal moves evaluation
       for (int r = 0; r <= ROWS; r++) {
           for (int c = 0; c <= COLS - 1; c++) {
               if (!state.horizontal_lines[r][c]) {
@@ -419,15 +439,15 @@ Move minimax(GameState state, int depth, bool maximizingPlayer, int alpha, int b
                       }
                       alpha = max(alpha, best_move.score);
 
-                      if (alpha >= beta)
-                          goto prune_max_horizontal;
+                      if (alpha >= beta)  
+                          goto prune_max_horizontal; // Beta branch cutoff
                   }
               }
           }
       }
       prune_max_horizontal:
-      // Vertical moves
-      for (int r = 0; r < ROWS; r++) {  // r goes from 0 to ROWS-1
+      // Vertical moves evaluation
+      for (int r = 0; r < ROWS; r++) { 
           for (int c = 0; c <= COLS; c++) {
               if (!state.vertical_lines[r][c]) {
                   GameState temp_state;
@@ -444,7 +464,7 @@ Move minimax(GameState state, int depth, bool maximizingPlayer, int alpha, int b
                       alpha = max(alpha, best_move.score);
 
                       if (alpha >= beta)
-                          goto prune_max_vertical;
+                          goto prune_max_vertical; // Beta branch cutoff
                   }
               }
           }
@@ -452,8 +472,9 @@ Move minimax(GameState state, int depth, bool maximizingPlayer, int alpha, int b
       prune_max_vertical:
           return best_move;
   } else {  // Minimizing player's turn
-      best_move.score = INF_MAX; // +INF_MAX
-      // Horizontal moves
+      best_move.score = INF_MAX;
+
+      // Horizontal moves evaluation
       for (int r = 0; r <= ROWS; r++) {
           for (int c = 0; c <= COLS - 1; c++) {
               if (!state.horizontal_lines[r][c]) {
@@ -471,13 +492,13 @@ Move minimax(GameState state, int depth, bool maximizingPlayer, int alpha, int b
                       beta = min(beta, best_move.score);
 
                       if (beta <= alpha)
-                          goto prune_min_horizontal;
+                          goto prune_min_horizontal; // Alpha branch cutoff
                   }
               }
           }
       }
       prune_min_horizontal:
-      // Vertical moves
+      // Vertical moves evaluation
       for (int r = 0; r < ROWS; r++) {
           for (int c = 0; c <= COLS; c++) {
               if (!state.vertical_lines[r][c]) {
@@ -495,7 +516,7 @@ Move minimax(GameState state, int depth, bool maximizingPlayer, int alpha, int b
                       beta = min(beta, best_move.score);
 
                       if (beta <= alpha)
-                          goto prune_min_vertical;
+                          goto prune_min_vertical; // Alpha branch cutoff
                   }
               }
           }
