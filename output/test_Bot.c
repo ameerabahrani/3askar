@@ -1,6 +1,6 @@
 #include <assert.h>
 #include <stdlib.h>
-
+// Include necessary headers as directory to the game.h  and dots_and_boxes.c and Logic.c and Bot.c from your device
 
 
 static void test_medium_bot_move(void) {
@@ -98,4 +98,3 @@ int main() {
     printf("All tests passed!\n");
     return 0;
 }
-
