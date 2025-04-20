@@ -5,7 +5,7 @@
  *
  * Requires
  *    (r, c) must be a valid box coordinate
- *    (state] needs to be initialized and cant be NULL
+ *    (state) needs to be initialized and cant be NULL
  *    (box_completed) must point to a valid boolean
 
  * Effects
@@ -27,6 +27,7 @@ void claim_box(GameState *state, int r, int c, bool *box_completed) {
   *box_completed = true;
   print_box(state, r, c);
 
+  // Update adjacent line colors
   int row = 2 * r + 1;
   int col = 2 * c + 1;
   int color = state->current_player;
@@ -53,7 +54,7 @@ void claim_box(GameState *state, int r, int c, bool *box_completed) {
  *     The move must already be validated and not already drawn
  *
  * Effects:
- *    draws a horizontal line between the chosen dots on the board
+ *    Handles horizontal line placement.
  *    Checks if one or two boxes were completed by this move
  *    Assigns completed boxes to the current player and adds it to their score
  *    Switches to the other player if no box was taken
@@ -65,7 +66,7 @@ void handle_horizontal_line(GameState *state, int r1, int c1, int c2) {
   bool box_completed = false;
   int min_col = (c1 < c2) ? c1 : c2;
 
-  // Check if the box above is checked to account for two boxes being completed at once
+  // Check adjacent boxes to the left and right of the horizontal line
   if (r1 > 0 && state->box_owner[r1 - 1][min_col] == 0 &&
       check_box(state, r1 - 1, min_col)) {
     claim_box(state, r1 - 1, min_col, &box_completed);
@@ -90,7 +91,7 @@ void handle_horizontal_line(GameState *state, int r1, int c1, int c2) {
  *    The move must already be validated and not already drawn
  *
  * Effects
- *    Draws a vertical line between the chosen dots on the board
+ *    Handles vertical line placement.
  *    Checks if one or at maximum two boxes were completed by this move
  *    Assigns completed boxes to the current player and changes their score
  *    Switches to the other player if no box was completed
@@ -128,22 +129,18 @@ void handle_vertical_line(GameState *state, int r1, int c1, int r2) {
  *   (r, c) must refer to a valid box on the board
  *
  * Effects
- *   Updates the box at given coordinates (r, c) with the current player's
- symbol
- *       A for player 1
- *       B for player 2
- *   Sets the color of the box to match the current player
+ *   Updates visual representation of a claimed box.
  *
  * Returns
  *    Nothing
  */
-void print_box(GameState *state, int r, int c) { // print the player's letter in the box
+void print_box(GameState *state, int r, int c) {
   if (state->current_player == 1) {
-    state->board[2 * r + 1][2 * c + 1].symbol = 'A';
-    state->board[2 * r + 1][2 * c + 1].color = 1; // set the color of the box to the current player
+    state->board[2 * r + 1][2 * c + 1].symbol = 'A'; // print the player's letter in the box
+    state->board[2 * r + 1][2 * c + 1].color = 1; // Set the color of the box to the current player
   } else if (state->current_player == 2) {
     state->board[2 * r + 1][2 * c + 1].symbol = 'B';
-    state->board[2 * r + 1][2 * c + 1].color = 2; // set the color of the box to the current player
+    state->board[2 * r + 1][2 * c + 1].color = 2;
   }
 }
 
@@ -154,9 +151,8 @@ void print_box(GameState *state, int r, int c) { // print the player's letter in
  *   The board must be fully initialized with Cell objects
  *
  * Effects
- *    prints the current state of the game board to the console
- *    Includes dots, horizontal/vertical lines and box ownership
- *    applies color formatting.
+ *    Updates current game board with coordinates, horizontal/vertical lines and box ownership
+ *    Applies color formatting.
  *
  * Returns
  *    Nothing
@@ -165,14 +161,14 @@ void print_board(Cell board[ROWS * 2 + 1][COLS * 2 + 1]) {
   int rows = ROWS * 2 + 1;
   int cols = COLS * 2 + 1;
 
-  // Print the column header (0 to COLS)
+  // Print the column header 
   printf("  ");
   for (int j = 0; j <= COLS; j++) {
     printf("%d ", j);
   }
   printf("\n");
 
-  // Print the board rows with row coordinates for even rows
+  // Print each row
   for (int i = 0; i < rows; i++) {
     if (i % 2 == 0) {
       printf("%d ", i / 2);
@@ -200,7 +196,7 @@ void print_board(Cell board[ROWS * 2 + 1][COLS * 2 + 1]) {
  *   All coordinates must be within the board bounds
  *
  * Effects:
- *   Analyzes the  position of the two dots
+ *   Analyzes the position of the two dots
  *   Determines if the move is horizontal or vertical
  *
  * Returns:
@@ -215,7 +211,7 @@ int get_line_type(int r1, int c1, int r2, int c2) {
   if (c1 == c2) {
     return VERTICAL;
   }
-  return -1; // invalid
+  return -1;
 }
 
 /**
@@ -231,7 +227,7 @@ int get_line_type(int r1, int c1, int r2, int c2) {
  *    true  if the coordinates are adjacent
  *    false if they are not adjacent
  */
-bool adjacent(int r1, int c1, int r2, int c2) { // check if the lines are adjacent
+bool adjacent(int r1, int c1, int r2, int c2) { 
   if (r1 == r2 && abs(c1 - c2) == 1) {
     return true;
   }
@@ -256,7 +252,7 @@ bool adjacent(int r1, int c1, int r2, int c2) { // check if the lines are adjace
  *    true  if the box is completed
  *    false if the box is not completed
  */
-bool check_box(GameState *state, int r, int c) { // check if the box is completed
+bool check_box(GameState *state, int r, int c) { 
   if (r < 0 || r >= ROWS || c < 0 || c >= COLS) {
     return false;
   }
@@ -275,9 +271,7 @@ bool check_box(GameState *state, int r, int c) { // check if the box is complete
  *    The 2 Coordinates needto be adjacent either vertically or horizontally.
  *
  * Effects;
- *    Updates GameState by marking the chosen horizontal / vertical line as
- * taken. updates the board's representation with the symbol and player color.
- *    Does not update score or switch players
+ *    Processes the move by checking if the line is valid and not already taken, updates game state.
  *
  * Returns:
  *     0  move is valid
@@ -376,8 +370,7 @@ void normalize_input(char *str) {
  *
  * Effects:
  *    Initializes the visual board with dots in their positions
- *    Clears any previous line symbols or box ownerships from the board
- *    Prepares the board for a new game round
+ *    Clears any previous line symbols or box ownerships from the board for new round
  *
  * Returns:
  *   Nothing
