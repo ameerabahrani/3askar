@@ -20,7 +20,7 @@ int main() {
     */ 
   int mode;
   while (1) { 
-    printf("Choose game mode or \"Exit\":\n");
+    printf("Choose game mode:\n");
     printf("(1) Two Players (Human vs. Human)\n");
     printf("(2) Human vs. Bot (Easy Level)\n");
     printf("(3) Human vs. Bot (Medium Level)\n");
