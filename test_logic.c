@@ -1,5 +1,10 @@
 #include <assert.h>
 #include <stdbool.h>
+#include "game.h"
+#include "logic.c"
+#include "bot.c"
+
+
  
 
 static void test_line_type(void) {
