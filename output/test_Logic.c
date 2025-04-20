@@ -1,6 +1,6 @@
 #include <assert.h>
 #include <stdbool.h>
-#include "C:\Users\user\3askar\Logic.c"    
+ 
 
 static void test_line_type(void) {
     assert(get_line_type(0,0, 0,1) == HORIZONTAL);
