@@ -1,6 +1,8 @@
 #include <assert.h>
 #include <stdlib.h>
-#include "game.h"
+#include "C:\Users\user\3askar\Bot.c"
+#include "C:\Users\user\3askar\Logic.c"
+
 
 
 static void test_medium_bot_move(void) {
