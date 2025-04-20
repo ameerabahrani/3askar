@@ -1,7 +1,6 @@
 #include <assert.h>
 #include <stdlib.h>
 
-#include "C:\Users\Ahmed Faleh\OneDrive\Desktop\270 project\3askar\game.h"
 
 
 static void test_medium_bot_move(void) {

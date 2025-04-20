@@ -11,8 +11,8 @@ static void test_line_type(void) {
 static void test_adjacent(void) {
     assert(adjacent(0,0, 0,1) == true); //valid horizontal adjacency
     assert(adjacent(0,0, 1,0) == true); // valid vertical adjacency
-    assert(!adjacent(0,0, 1,1) == false); // diagonal non-adjacent
-    assert(adjacent(ROWS - 1, COLS - 1, ROWS - 2, COLS - 1) == true); // vild vertical adjacency at the edge of the board
+    assert(adjacent(0,0, 1,1) == false); // diagonal non-adjacent
+    assert(adjacent(ROWS - 1, COLS - 1, ROWS - 2, COLS - 1) == true); // valid vertical adjacency at the edge of the board
     assert(adjacent(0, 0, 0, 0) == false); // point cannot be adjacent to itself
     assert(adjacent(0, 0, 0, 2) == false); // not adjacent
     assert(adjacent(0, 0, 2, 0) == false); // not adjacent
