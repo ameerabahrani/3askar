@@ -83,8 +83,6 @@ void easy_bot_move(GameState *state) { // easy bot that plays a random move
  */
 void medium_bot_move(GameState *state) { // medium bot that plays a move that will complete the most
                                          // boxes or random move if no boxes can be completed
-  struct timeval start, end;
-  gettimeofday(&start, NULL);
 
   int most_boxes = 0;
   int r1, c1, r2, c2;
@@ -128,12 +126,6 @@ void medium_bot_move(GameState *state) { // medium bot that plays a move that wi
   pthread_join(threads[1], NULL);
 
   pthread_mutex_destroy(&lock);
-
-  gettimeofday(&end, NULL); // End time measurement
-  long seconds = end.tv_sec - start.tv_sec;
-  long micros = ((seconds * 1000000) + end.tv_usec) - start.tv_usec;
-  double elapsed = (double)micros / 1000000.0;
-  printf("Bot decision time: %.3f seconds\n", elapsed);
 
   if (move_with_box) {
     int result = process_move(state, r1, c1, r2, c2);
@@ -279,10 +271,9 @@ void hard_bot_move(GameState *state) {
   for (int r = 0; r <= ROWS; r++) { 
       for (int c = 0; c <= COLS - 1; c++) {
           if (!state->horizontal_lines[r][c]) {
-              GameState temp_state;
-              GET_DEEP_COPY(temp_state, state);  // Macro handles allocation and free
-
-              if (simulate_apply_move(&temp_state, r, c, r, c + 1) == 0) {
+              GameState temp_state = *state;
+              bool box_completed;
+              if (simulate_apply_move(&temp_state, r, c, r, c + 1, &box_completed) == 0) {
                   Move curr_move = minimax(temp_state, MAX_DEPTH, (temp_state.current_player == 2), INF_MIN, INF_MAX); 
                   if (curr_move.score > best_move.score) {
                       best_move.score = curr_move.score;
@@ -296,14 +287,13 @@ void hard_bot_move(GameState *state) {
       }
   }
 
-  // Vertical moves loop (note: r goes from 0 to ROWS-1)
+  // Vertical moves loop 
   for (int r = 0; r < ROWS; r++) {
       for (int c = 0; c <= COLS; c++) {
           if (!state->vertical_lines[r][c]) {
-              GameState temp_state;
-              GET_DEEP_COPY(temp_state, state);
-
-              if (simulate_apply_move(&temp_state, r, c, r + 1, c) == 0) {
+            GameState temp_state = *state;
+              bool box_completed;
+              if (simulate_apply_move(&temp_state, r, c, r + 1, c, &box_completed) == 0) {
                   Move curr_move = minimax(temp_state, MAX_DEPTH, (temp_state.current_player == 2), INF_MIN, INF_MAX); 
                   if (curr_move.score > best_move.score) {
                       best_move.score = curr_move.score;
@@ -317,7 +307,7 @@ void hard_bot_move(GameState *state) {
       }
   }
 
-  if (best_move.score != -10000000) { // If a valid move was found
+  if (best_move.score != INF_MIN) { // If a valid move was found
       int result = process_move(state, best_move.r1, best_move.c1, best_move.r2, best_move.c2);
       int lt = get_line_type(best_move.r1, best_move.c1, best_move.r2, best_move.c2);
       if (lt == HORIZONTAL) {
@@ -331,7 +321,7 @@ void hard_bot_move(GameState *state) {
 }
 
 /**
- * int simulate_apply_move(GameState *state, int r1, int c1, int r2, int c2)
+ * int simulate_apply_move(GameState *state, int r1, int c1, int r2, int c2, bool *box_completed)
  *
  * Requires:
  *      The GameState pointer (state) should not be NULL.
@@ -347,18 +337,23 @@ void hard_bot_move(GameState *state) {
  *      -3 if the line is already taken
  *      -4 if the coordinates are out of bounds
  */
-int simulate_apply_move(GameState *state, int r1, int c1, int r2, int c2) {
+int simulate_apply_move(GameState *state, int r1, int c1, int r2, int c2, bool *box_completed) {
+  int original_score = state->scores[state->current_player - 1];
   int result = process_move(state, r1, c1, r2, c2);
-  if (result != 0)
+  if (result != 0) { 
+    *box_completed = false;
     return result;
+  }
 
-  int linetype = get_line_type(r1, c1, r2, c2);
-  if (linetype == HORIZONTAL) { 
+  int lt = get_line_type(r1, c1, r2, c2);
+  if (lt == HORIZONTAL) { 
     handle_horizontal_line(state, r1, c1, c2);
   }
-  if (linetype == VERTICAL) { 
+  if (lt == VERTICAL) { 
     handle_vertical_line(state, r1, c1, r2);
   }
+
+  *box_completed = (state->scores[state->current_player - 1] > original_score);
   return 0;
 }
 
@@ -393,114 +388,90 @@ int evaluation_function(GameState *state) {
  *      The best move for the current player.
  */
 Move minimax(GameState state, int depth, bool maximizingPlayer, int alpha, int beta) {
-  Move best_move;
   if (depth == 0 || state.remaining_boxes == 0) {
-      best_move.score = evaluation_function(&state);
-      best_move.r1 = best_move.c1 = best_move.r2 = best_move.c2 = -1;
-      return best_move;
+      Move move;
+      move.score = evaluation_function(&state);
+      move.r1 = move.c1 = move.r2 = move.c2 = -1;
+      return move;
   }
 
-  if (maximizingPlayer) {
-      best_move.score = INF_MIN; // -INF_MAX
-      // Horizontal moves
-      for (int r = 0; r <= ROWS; r++) {
-          for (int c = 0; c <= COLS - 1; c++) {
-              if (!state.horizontal_lines[r][c]) {
-                  GameState temp_state;
-                  GET_DEEP_COPY(temp_state, &state);
-                  if (simulate_apply_move(&temp_state, r, c, r, c + 1) == 0) {
-                      Move curr_move = minimax(temp_state, depth - 1, (temp_state.current_player == 2), alpha, beta);
-                      if (curr_move.score > best_move.score) {
-                          best_move.score = curr_move.score;
-                          best_move.r1 = r;
-                          best_move.c1 = c;
-                          best_move.r2 = r;
-                          best_move.c2 = c + 1;
-                      }
-                      alpha = max(alpha, best_move.score);
+  Move best_move;
+  best_move.score = maximizingPlayer ? INF_MIN : INF_MAX;
+  best_move.r1 = best_move.c1 = best_move.r2 = best_move.c2 = -1;
 
-                      if (alpha >= beta)
-                          goto prune_max_horizontal;
-                  }
+  // Horizontal moves
+  for (int r = 0; r <= ROWS; r++) {
+      for (int c = 0; c <= COLS - 1; c++) {
+          if (state.horizontal_lines[r][c]) continue;
+
+          GameState temp_state = state;
+
+          bool box_completed;
+          int result = simulate_apply_move(&temp_state, r, c, r, c+1, &box_completed);
+          
+          if (result == 0) {
+              bool new_maximizing = maximizingPlayer;
+              if (!box_completed) {
+                  new_maximizing = !maximizingPlayer; // Switch player
+              }
+              
+              Move curr_move = minimax(temp_state, depth - 1, new_maximizing, alpha, beta);
+
+              if ((maximizingPlayer && curr_move.score > best_move.score) ||
+                  (!maximizingPlayer && curr_move.score < best_move.score)) {
+                  best_move = curr_move;
+                  best_move.r1 = r;
+                  best_move.c1 = c;
+                  best_move.r2 = r;
+                  best_move.c2 = c + 1;
+              }
+
+              if (maximizingPlayer) {
+                  alpha = max(alpha, best_move.score);
+              } else {
+                  beta = min(beta, best_move.score);
               }
           }
-      }
-      prune_max_horizontal:
-      // Vertical moves
-      for (int r = 0; r < ROWS; r++) {  // r goes from 0 to ROWS-1
-          for (int c = 0; c <= COLS; c++) {
-              if (!state.vertical_lines[r][c]) {
-                  GameState temp_state;
-                  GET_DEEP_COPY(temp_state, &state);
-                  if (simulate_apply_move(&temp_state, r, c, r + 1, c) == 0) {
-                      Move curr_move = minimax(temp_state, depth - 1, (temp_state.current_player == 2), alpha, beta);
-                      if (curr_move.score > best_move.score) {
-                          best_move.score = curr_move.score;
-                          best_move.r1 = r;
-                          best_move.c1 = c;
-                          best_move.r2 = r + 1;
-                          best_move.c2 = c;
-                      }
-                      alpha = max(alpha, best_move.score);
 
-                      if (alpha >= beta)
-                          goto prune_max_vertical;
-                  }
-              }
-          }
+          if (alpha >= beta) goto prune;
       }
-      prune_max_vertical:
-          return best_move;
-  } else {  // Minimizing player's turn
-      best_move.score = INF_MAX; // +INF_MAX
-      // Horizontal moves
-      for (int r = 0; r <= ROWS; r++) {
-          for (int c = 0; c <= COLS - 1; c++) {
-              if (!state.horizontal_lines[r][c]) {
-                  GameState temp_state;
-                  GET_DEEP_COPY(temp_state, &state);
-                  if (simulate_apply_move(&temp_state, r, c, r, c + 1) == 0) {
-                      Move curr_move = minimax(temp_state, depth - 1, (temp_state.current_player == 2), alpha, beta);
-                      if (curr_move.score < best_move.score) {
-                          best_move.score = curr_move.score;
-                          best_move.r1 = r;
-                          best_move.c1 = c;
-                          best_move.r2 = r;
-                          best_move.c2 = c + 1;
-                      }
-                      beta = min(beta, best_move.score);
-
-                      if (beta <= alpha)
-                          goto prune_min_horizontal;
-                  }
-              }
-          }
-      }
-      prune_min_horizontal:
-      // Vertical moves
-      for (int r = 0; r < ROWS; r++) {
-          for (int c = 0; c <= COLS; c++) {
-              if (!state.vertical_lines[r][c]) {
-                  GameState temp_state;
-                  GET_DEEP_COPY(temp_state, &state);
-                  if (simulate_apply_move(&temp_state, r, c, r + 1, c) == 0) {
-                      Move curr_move = minimax(temp_state, depth - 1, (temp_state.current_player == 2), alpha, beta);
-                      if (curr_move.score < best_move.score) {
-                          best_move.score = curr_move.score;
-                          best_move.r1 = r;
-                          best_move.c1 = c;
-                          best_move.r2 = r + 1;
-                          best_move.c2 = c;
-                      }
-                      beta = min(beta, best_move.score);
-
-                      if (beta <= alpha)
-                          goto prune_min_vertical;
-                  }
-              }
-          }
-      }
-      prune_min_vertical:
-          return best_move;
   }
+  
+  for (int r = 0; r < ROWS; r++) {
+      for (int c = 0; c <= COLS; c++) {
+          if (state.vertical_lines[r][c]) continue;
+
+          GameState temp_state = state;
+
+          bool box_completed;
+          int result = simulate_apply_move(&temp_state, r, c, r + 1, c, &box_completed);
+          
+          if (result == 0) {
+              bool new_maximizing = maximizingPlayer;
+              if (!box_completed) {
+                  new_maximizing = !maximizingPlayer; // Switch player
+              }
+
+              Move curr_move = minimax(temp_state, depth - 1, new_maximizing, alpha, beta);
+
+              if ((maximizingPlayer && curr_move.score > best_move.score) ||
+                  (!maximizingPlayer && curr_move.score < best_move.score)) {
+                  best_move = curr_move;
+                  best_move.r1 = r;
+                  best_move.c1 = c;
+                  best_move.r2 = r + 1;
+                  best_move.c2 = c;
+              }
+
+              if (maximizingPlayer) {
+                  alpha = max(alpha, best_move.score);
+              } else {
+                  beta = min(beta, best_move.score);
+              }
+          }
+          if (alpha >= beta) goto prune;
+      }
+  }
+prune:
+  return best_move;
 }

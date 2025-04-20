@@ -8,7 +8,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/time.h>
 
 enum { HORIZONTAL, VERTICAL }; // for line type
 
@@ -22,18 +21,6 @@ enum { HORIZONTAL, VERTICAL }; // for line type
 #define RED_COLOR "\033[1;31m"  // Player B
 #define INF_MAX INT_MAX         // Infinity
 #define INF_MIN INT_MIN         // Negative Infinity
-#define GET_DEEP_COPY(dest, state_ptr)                                         \
-  do {                                                                         \
-    GameState *_copy_ptr = deep_copy_GameState(state_ptr);                     \
-    if (_copy_ptr == NULL) {                                                   \
-      fprintf(                                                                 \
-          stderr,                                                              \
-          "Error: Unable to allocate memory for deep copy of GameState.\n");   \
-      exit(EXIT_FAILURE);                                                      \
-    }                                                                          \
-    (dest) = *_copy_ptr;                                                       \
-    free(_copy_ptr);                                                           \
-  } while (0)
 #define max(a, b) ((a) > (b) ? (a) : (b))
 #define min(a, b) ((a) < (b) ? (a) : (b))
 
@@ -91,9 +78,8 @@ void threaded_minimax_wrapper(GameState *state);
 int simulate_box_completion_count(GameState state, int r1, int c1, int r2, int c2);
 void init_board(GameState *state);
 int evaluation_function(GameState *state);
-int simulate_apply_move(GameState *state, int r1, int c1, int r2, int c2);
+int simulate_apply_move(GameState *state, int r1, int c1, int r2, int c2, bool *box_completed);
 Move minimax(GameState state, int depth, bool maximizingPlayer, int alpha, int beta);
-GameState *deep_copy_GameState(const GameState *src);
 void* medium_bot_thread(void* args);
 
 #endif

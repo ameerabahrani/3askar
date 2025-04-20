@@ -138,8 +138,16 @@ int main() {
         printf(RED_COLOR "Player B (Bot)" RESET_COLOR " is thinking...\n");
         medium_bot_move(&game);
       } else if (mode == 4) { // Hard bot
-        printf(RED_COLOR "Player B (Bot)" RESET_COLOR " is thinking...\n");
-        hard_bot_move(&game);
+        int total_initial_moves = (ROWS+1)*COLS + ROWS*(COLS+1); // 49 for ROWS=4, COLS=5
+        int moves_made = total_initial_moves - game.remaining_moves;
+    
+        if (moves_made < 20) { 
+            printf(RED_COLOR "Player B (Bot)" RESET_COLOR " is thinking...\n");
+            medium_bot_move(&game);
+        } else {
+            printf(RED_COLOR "Player B (Bot)" RESET_COLOR " is thinking...\n");
+            hard_bot_move(&game);
+        }
       }
     }
     printf("********************************************************************************\n");
