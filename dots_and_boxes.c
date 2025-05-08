@@ -42,6 +42,31 @@ int main() {
 
   srand(time(NULL));  // Seed the random generator for bot
 
+  if (mode > 1) {
+    char first_input[16];
+    int who_first = 0;
+    printf("Who should play first?\n");
+    printf("(1) User \n");
+    printf("(2) Bot\n");
+
+    if (fgets(first_input, sizeof(first_input), stdin) == NULL) {
+      printf("Error reading input. Exiting.\n");
+      return 1;
+    }
+
+    if (sscanf(first_input, "%d", &who_first) == 1 &&
+        (who_first == 1 || who_first == 2)) {
+      game.current_player = who_first;
+    } else {
+      printf("Invalid input. Please enter 1 or 2.\n");
+    }
+
+    if (who_first == 2) { 
+      game.current_player = 2; 
+    }
+
+  }
+
   // Main game loop - continues until all boxes are claimed
   while (game.remaining_boxes > 0) { 
     print_board(game.board);
